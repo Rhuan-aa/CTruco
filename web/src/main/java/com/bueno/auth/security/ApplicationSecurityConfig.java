@@ -73,6 +73,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/refresh-token").permitAll()
+                .antMatchers("/api/v2/**").permitAll()
+                .antMatchers("/ws-handshake/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .antMatchers("/register").permitAll()
                 .antMatchers("/api/v1/**").authenticated()

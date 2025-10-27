@@ -57,7 +57,11 @@ public class GameController {
 
     public GameController(CreateGameUseCase createGameUseCase,
                           RemoveGameUseCase removeGameUseCase,
-                          GameRepository gameRepository, RemoteBotRepository remoteBotRepository, RemoteBotApi remoteBotApi, BotManagerService botManagerService, GameResultRepository gameResultRepository) {
+                          GameRepository gameRepository,
+                          RemoteBotRepository remoteBotRepository,
+                          RemoteBotApi remoteBotApi,
+                          BotManagerService botManagerService,
+                          GameResultRepository gameResultRepository) {
         this.createGameUseCase = createGameUseCase;
         this.removeGameUseCase = removeGameUseCase;
         this.gameRepository = gameRepository;
