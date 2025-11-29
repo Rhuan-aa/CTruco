@@ -65,7 +65,7 @@ public class GameEntity {
                 players.get(player2),
                 players.get(firstToPlay),
                 players.get(lastToPlay),
-                hands.stream().map(hand -> hand.toDto(players)).toList()
+                hands.stream().map(hand -> hand.toDto(id, players)).toList()
         );
     }
 }

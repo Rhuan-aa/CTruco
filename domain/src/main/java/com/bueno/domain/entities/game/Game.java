@@ -84,7 +84,7 @@ public class Game {
         firstToPlay.setCards(deck.take(3));
         lastToPlay.setCards(deck.take(3));
 
-        final Hand hand = new Hand(firstToPlay, lastToPlay, vira);
+        final Hand hand = new Hand(uuid, firstToPlay, lastToPlay, vira);
         hands.add(hand);
     }
 
