@@ -34,6 +34,7 @@ public class IntelConverter {
                 .collect(Collectors.toList());
 
         return new IntelDto(
+                intel.getGameId(),
                 intel.timestamp(),
                 intel.isGameDone(),
                 intel.gameWinner().orElse(null),
@@ -68,6 +69,7 @@ public class IntelConverter {
                 .collect(Collectors.toList());
 
         return new Intel(
+                dto.gameId(),
                 dto.timestamp(),
                 dto.isGameDone(),
                 dto.gameWinner(),

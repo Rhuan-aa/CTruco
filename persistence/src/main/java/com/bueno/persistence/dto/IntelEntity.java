@@ -96,10 +96,11 @@ public class IntelEntity {
                 .build();
     }
 
-    public IntelDto toDto() {
+    public IntelDto toDto(UUID gameID) {
         final Function<String, CardDto> toCardDto = card -> card != null ?
                 new CardDto(card.substring(0, 1), card.substring(1, 2)) : null;
         return new IntelDto(
+                gameID,
                 timestamp,
                 isGameDone,
                 gameWinner,

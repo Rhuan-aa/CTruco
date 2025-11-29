@@ -97,7 +97,7 @@ public class GameRepositoryImpl implements GameRepository {
         final int index = game.getHands().size() - 1;
         final HandEntity hand = game.getHands().get(index);
         Map<UUID, PlayerDto> players = playersMap(game);
-        final HandDto handDto = game.getHands().get(index).toDto(players);
+        final HandDto handDto = game.getHands().get(index).toDto(game.getId(), players);
         final IntelDto intel = handDto.history().get(handDto.history().size() - 1);
         final Instant lastInteraction = intel.timestamp();
         final Instant now = Instant.now();

@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 public class Intel{
 
     private final Instant timestamp;
+    private UUID gameId;
 
     private boolean gameIsDone;
     private UUID gameWinner;
@@ -60,13 +61,15 @@ public class Intel{
     private Set<String> possibleActions;
 
     private Intel() {
+
         timestamp = Instant.now();
     }
 
-    public Intel(Instant timestamp, boolean gameIsDone, UUID gameWinner, boolean maoDeOnze, Integer handPoints, Integer pointsProposal, List<Optional<String>> roundWinnersUsernames,
+    public Intel(UUID gameId, Instant timestamp, boolean gameIsDone, UUID gameWinner, boolean maoDeOnze, Integer handPoints, Integer pointsProposal, List<Optional<String>> roundWinnersUsernames,
                  List<Optional<UUID>> roundWinnersUuid, int roundsPlayed, Card vira, List<Card> openCards, String handWinner, UUID currentPlayerUuid, Integer currentPlayerScore,
                  String currentPlayerUsername, Integer currentOpponentScore, String currentOpponentUsername, Card cardToPlayAgainst,
                  List<PlayerIntel> playersIntel, String event, UUID eventPlayerUuid, String eventPlayerUsername, Set<String> possibleActions){
+        this.gameId = gameId;
         this.timestamp = timestamp;
         this.gameIsDone = gameIsDone;
         this.gameWinner = gameWinner;
@@ -96,6 +99,7 @@ public class Intel{
         final Hand hand = Objects.requireNonNull(currentHand);
         final Intel result = new Intel();
         result.event = event.toString();
+        result.gameId = hand.getGameId();
         result.setHandIntel(hand);
         result.setPlayersIntel(hand);
         return result;
@@ -301,6 +305,9 @@ public class Intel{
         return Optional.ofNullable(eventPlayerUsername);
     }
 
+    public UUID getGameId() {
+        return gameId;
+    }
 
     @Override
     public boolean equals(Object o) {
