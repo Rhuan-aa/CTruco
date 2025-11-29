@@ -29,6 +29,7 @@ import com.bueno.domain.usecases.game.converter.GameConverter;
 import com.bueno.domain.usecases.game.dtos.CreateDetachedDto;
 import com.bueno.domain.usecases.game.dtos.CreateForBotsDto;
 import com.bueno.domain.usecases.game.dtos.CreateForUserAndBotDto;
+import com.bueno.domain.usecases.game.dtos.CreateForUserAndUserDto;
 import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
 import com.bueno.domain.usecases.intel.dtos.IntelDto;
@@ -84,6 +85,27 @@ public class CreateGameUseCase {
         });
 
         return create(userPlayer, botPlayer);
+    }
+
+    public IntelDto createForUserAndUser(CreateForUserAndUserDto request) {
+        Objects.requireNonNull(request, "Request not be null!");
+
+        final ApplicationUserDto user1 = userRepo.findByUuid(request.userUuid1())
+                .orElseThrow(() -> new EntityNotFoundException("User not found:" + request.userUuid1()));
+        final ApplicationUserDto user2 = userRepo.findByUuid(request.userUuid2())
+                .orElseThrow(() -> new EntityNotFoundException("User not found:" + request.userUuid2()));
+
+        final Player player1 = Player.of(user1.uuid(), user1.username());
+        final Player player2 = Player.of(user2.uuid(), user2.username());
+
+        gameRepo.findByPlayerUuid(player1.getUuid()).ifPresent(unused -> {
+            throw new IllegalGameEnrolmentException(player1.getUuid() + " is already playing a game.");
+        });
+        gameRepo.findByPlayerUuid(player2.getUuid()).ifPresent(unused -> {
+            throw new IllegalGameEnrolmentException(player2.getUuid() + " is already playing a game.");
+        });
+
+        return create(player1, player2);
     }
 
     private boolean hasNoBotServiceWith(String botName) {
