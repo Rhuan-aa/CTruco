@@ -15,6 +15,8 @@ public class DataBaseBuilder {
             statement.addBatch(createGameResultTable());
             statement.addBatch(createHandResultsTable());
             statement.addBatch(createRankBotsTable());
+            statement.addBatch(createSessionTable());
+            statement.addBatch(createInviteTable());
 //            statement.addBatch(createTournamentTable());
 //            statement.addBatch(createTournamentParticipantsTable());
 //            statement.addBatch(createTournamentMatchesTable());
@@ -33,6 +35,8 @@ public class DataBaseBuilder {
             statement.addBatch("DROP TABLE IF EXISTS remote_bot");
             statement.addBatch("DROP TABLE IF EXISTS hand_result");
             statement.addBatch("DROP TABLE IF EXISTS game_result");
+            statement.addBatch("DROP TABLE IF EXISTS session");
+            statement.addBatch("DROP TABLE IF EXISTS invite");
             statement.addBatch("DROP TABLE IF EXISTS app_user");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament_participant");
@@ -123,6 +127,36 @@ public class DataBaseBuilder {
                     bot_name VARCHAR(30),
                     wins INTEGER,
                     CONSTRAINT bot_rank_pk PRIMARY KEY(rank)
+                );
+                """;
+    }
+
+    private String createSessionTable() {
+        return """
+                CREATE TABLE IF NOT EXISTS SESSION(
+                    uuid UUID NOT NULL,
+                    player_uuid UUID NOT NULL,
+                    expires_at TIMESTAMP NOT NULL,
+                    CONSTRAINT session_uuid_pk PRIMARY KEY (uuid),
+                    CONSTRAINT session_player_uuid_fk FOREIGN KEY (player_uuid) REFERENCES app_user(uuid)
+                        ON DELETE CASCADE,
+                    CONSTRAINT session_player_uuid_uk UNIQUE (player_uuid)
+                );
+                """;
+    }
+
+    private String createInviteTable() {
+        return """
+                CREATE TABLE IF NOT EXISTS INVITE(
+                    uuid UUID NOT NULL,
+                    host_player_uuid UUID NOT NULL,
+                    invited_player_uuid UUID NOT NULL,
+                    expires_at TIMESTAMP NOT NULL,
+                    CONSTRAINT invite_uuid_pk PRIMARY KEY (uuid),
+                    CONSTRAINT host_player_uuid_fk FOREIGN KEY (host_player_uuid) REFERENCES app_user(uuid),
+                    CONSTRAINT invited_player_uuid_fk FOREIGN KEY (invited_player_uuid) REFERENCES app_user(uuid),
+                    CONSTRAINT self_invite_ck CHECK (host_player_uuid <> invited_player_uuid),
+                    CONSTRAINT invite_pair_uk UNIQUE (host_player_uuid, invited_player_uuid)
                 );
                 """;
     }
