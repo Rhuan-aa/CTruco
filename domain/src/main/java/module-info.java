@@ -23,4 +23,9 @@ module domain {
     exports com.bueno.domain.usecases.tournament.repos;
     exports com.bueno.domain.usecases.tournament.dtos;
     exports com.bueno.domain.usecases.tournament.converter;
+    exports com.bueno.domain.usecases.session.dtos;
+    exports com.bueno.domain.usecases.session.usecase;
+    exports com.bueno.domain.usecases.session.repos;
+    exports com.bueno.domain.usecases.invite.dtos;
+    exports com.bueno.domain.usecases.invite.repos;
 }
