@@ -24,6 +24,9 @@ import com.bueno.auth.jwt.JwtProperties;
 import com.bueno.auth.jwt.JwtTokenHelper;
 import com.bueno.auth.jwt.JwtTokenVerifier;
 import com.bueno.auth.jwt.JwtUsernameAndPasswordAuthenticationFilter;
+import com.bueno.domain.usecases.session.usecase.CreateSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.FindSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.RefreshSessionUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -48,16 +51,22 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SecretKey secretKey;
     private final JwtProperties jwtProperties;
     private final JwtTokenHelper jwtTokenHelper;
+    private final CreateSessionUseCase createSessionUseCase;
+    private final FindSessionUseCase findSessionUseCase;
+    private final RefreshSessionUseCase refreshSessionUseCase;
 
     public ApplicationSecurityConfig(PasswordEncoder encoder,
                                      ApplicationUserService applicationUserService,
                                      SecretKey secretKey,
-                                     JwtProperties jwtProperties, JwtTokenHelper jwtTokenHelper) {
+                                     JwtProperties jwtProperties, JwtTokenHelper jwtTokenHelper, CreateSessionUseCase createSessionUseCase, FindSessionUseCase findSessionUseCase, RefreshSessionUseCase refreshSessionUseCase) {
         this.encoder = encoder;
         this.applicationUserService = applicationUserService;
         this.secretKey = secretKey;
         this.jwtProperties = jwtProperties;
         this.jwtTokenHelper = jwtTokenHelper;
+        this.createSessionUseCase = createSessionUseCase;
+        this.findSessionUseCase = findSessionUseCase;
+        this.refreshSessionUseCase = refreshSessionUseCase;
     }
 
     @Override
@@ -67,7 +76,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtProperties, jwtTokenHelper))
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtProperties, jwtTokenHelper, createSessionUseCase, findSessionUseCase, refreshSessionUseCase))
                 .addFilterAfter(new JwtTokenVerifier(jwtProperties, jwtTokenHelper), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/").permitAll()

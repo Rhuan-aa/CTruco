@@ -25,6 +25,8 @@ import com.bueno.auth.jwt.JwtProperties;
 import com.bueno.auth.jwt.JwtTokenHelper;
 import com.bueno.auth.security.ApplicationUser;
 import com.bueno.auth.security.ApplicationUserService;
+import com.bueno.domain.usecases.session.usecase.DeleteSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.RefreshSessionUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
@@ -49,12 +51,16 @@ public class RefreshTokenController {
     private final ApplicationUserService applicationUserService;
     private final JwtProperties jwtProperties;
     private final JwtTokenHelper jwtTokenHelper;
+    private final RefreshSessionUseCase refreshSessionUseCase;
+    private final DeleteSessionUseCase deleteSessionUseCase;
 
     public RefreshTokenController(ApplicationUserService applicationUserService, JwtProperties jwtProperties,
-                                  JwtTokenHelper jwtTokenHelper) {
+                                  JwtTokenHelper jwtTokenHelper, RefreshSessionUseCase refreshSessionUseCase, DeleteSessionUseCase deleteSessionUseCase) {
         this.applicationUserService = applicationUserService;
         this.jwtProperties = jwtProperties;
         this.jwtTokenHelper = jwtTokenHelper;
+        this.refreshSessionUseCase = refreshSessionUseCase;
+        this.deleteSessionUseCase = deleteSessionUseCase;
     }
 
     @GetMapping
@@ -81,6 +87,9 @@ public class RefreshTokenController {
             final var token = jwtTokenHelper.createAccessToken(user, issuer);
 
             response.addHeader(jwtProperties.getAuthorizationHeader(), jwtProperties.getTokenPrefix() + token);
+
+            final var session = refreshSessionUseCase.refreshSession(userId);
+            log.info("Refreshed session for: {}", userId);
 
             final Map<String, String> body = new HashMap<>();
             body.put("uuid", user.getUuid().toString());
@@ -119,6 +128,9 @@ public class RefreshTokenController {
 
             response.addCookie(expiredToken);
             response.setStatus(HttpStatus.NO_CONTENT.value());
+
+            deleteSessionUseCase.deleteByPlayerId(userId);
+            log.info("Deleted session for: {}", userId);
 
             log.info("User {} has been logged out.", user.getUsername());
         } catch (Exception e) {
