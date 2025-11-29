@@ -1,6 +1,7 @@
 package com.bueno.domain.usecases.session.usecase;
 
 import com.bueno.domain.entities.session.Session;
+import com.bueno.domain.usecases.session.dtos.SessionDto;
 import com.bueno.domain.usecases.session.repos.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,15 @@ public class CreateSessionUseCase {
         this.sessionRepo = sessionRepo;
     }
 
-    public void createSessionForUser(UUID playerUuid) {
-        Objects.requireNonNull(playerUuid, "Player uuid can not be null!");
-        create(playerUuid);
+    public SessionDto createSessionForUser(UUID playerUuid) {
+        Objects.requireNonNull(playerUuid, "Request model not be null!");
+        return create(playerUuid);
     }
 
-    private void create(UUID playerUuid){
+    private SessionDto create(UUID playerUuid){
         Session session = Session.of(playerUuid);
         var dto = Session.toDto(session);
         sessionRepo.save(dto);
+        return dto;
     }
 }
