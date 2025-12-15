@@ -62,10 +62,12 @@ public class WebApp {
                           RemoteBotRepository botRepository,
                           TournamentRepository tournamentRepository,
                           MatchRepository matchRepository,
-                          UserRepository userRepository
+                          UserRepository userRepository,
+                          RankBotsOnTime rankBotsOnTime
     ) {
         return args -> {
             TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
+            rankBotsOnTime.updateRankTable();
             if (botRepository.findAll().isEmpty()) {
                 tournamentRepository.deleteAll();
                 matchRepository.deleteAll();
