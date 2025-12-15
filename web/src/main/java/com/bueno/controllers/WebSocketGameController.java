@@ -23,8 +23,7 @@ public class WebSocketGameController {
 
     @MessageMapping("/games/{gameUuid}/quit")
     public void quitGame(@DestinationVariable UUID gameUuid, UUID playerUuid) {
-        removeGameUseCase.byUserUuid(playerUuid, false);
-        System.out.println("Chegou no back");
+        removeGameUseCase.byUserUuid(playerUuid, true);
         simpMessagingTemplate.convertAndSend("/topic/game/" + gameUuid + "/quit", gameUuid);
     }
 }
