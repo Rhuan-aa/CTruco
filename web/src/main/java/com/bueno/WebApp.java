@@ -25,6 +25,7 @@ import com.bueno.domain.usecases.bot.dtos.TransientRemoteBotDto;
 import com.bueno.domain.usecases.bot.repository.RemoteBotRepository;
 import com.bueno.domain.usecases.game.dtos.GameResultDto;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
+import com.bueno.domain.usecases.game.usecase.RankBotsOnTime;
 import com.bueno.domain.usecases.tournament.repos.MatchRepository;
 import com.bueno.domain.usecases.tournament.repos.TournamentRepository;
 import com.bueno.domain.usecases.user.RegisterUserUseCase;
@@ -55,7 +56,10 @@ public class WebApp {
                           GameResultRepository gameResultRepository,
                           PasswordEncoder encoder,
                           RemoteBotRepository botRepository,
-                          TournamentRepository tournamentRepository, MatchRepository matchRepository) {
+                          TournamentRepository tournamentRepository,
+                          MatchRepository matchRepository,
+                          RankBotsOnTime rankBotsOnTime
+    ) {
         return args -> {
             tournamentRepository.deleteAll();
             matchRepository.deleteAll();
@@ -81,7 +85,7 @@ public class WebApp {
                     LocalDateTime.now(), user2Uuid, user2Uuid, 7, user1Uuid, 12));
 
             gameResultRepository.findTopWinners(3).forEach((entry -> System.out.println(entry.username() + " - " + entry.wins())));
-
+            rankBotsOnTime.updateRankTable();
 //            gameResultRepository.findAllByUserUuid(defaultUuid).forEach(System.out::println);
 
         };
