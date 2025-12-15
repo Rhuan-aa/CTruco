@@ -147,7 +147,7 @@ class IntelTest {
         when(p2.getUsername()).thenReturn("name2");
         when(p1.getCards()).thenReturn(new ArrayList<>(List.of(Card.of(Rank.TWO, Suit.CLUBS))));
 
-        final Hand hand = new Hand(p1, p2, Card.of(Rank.THREE, Suit.CLUBS));
+        final Hand hand = new Hand(UUID.randomUUID(),p1, p2, Card.of(Rank.THREE, Suit.CLUBS));
 
         hand.playFirstCard(p1, Card.of(Rank.TWO, Suit.CLUBS));
         final Intel sut = hand.getLastIntel();

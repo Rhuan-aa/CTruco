@@ -35,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 
 import static com.bueno.domain.entities.hand.HandPoints.*;
 import static com.bueno.domain.entities.intel.PossibleAction.*;
@@ -52,7 +53,7 @@ class HandTest {
     void setUp() {
         Deck deck = new Deck();
         when(player1.getCards()).thenReturn(deck.take(40));
-        sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+        sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
     }
 
     @AfterEach
@@ -173,7 +174,7 @@ class HandTest {
         @DisplayName("Should not accept card that has not been dealt")
         void shouldNotAcceptCardThatHasNotBeenDealt() {
             when(player1.getCards()).thenReturn(List.of(Card.of(Rank.SEVEN, Suit.SPADES)));
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             assertThatExceptionOfType(GameRuleViolationException.class)
                     .isThrownBy(() -> sut.playFirstCard(player1, Card.of(Rank.KING, Suit.HEARTS)));
         }
@@ -561,7 +562,7 @@ class HandTest {
         @DisplayName("Should be the player with 11 points who decides if plays hand in mao de onze")
         void shouldBeThePlayerWith11PointsWhoDecidesIfPlaysHandInMaoDeOnze() {
             when(player2.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             assertThatIllegalArgumentException().isThrownBy(() -> sut.accept(player1));
         }
 
@@ -569,7 +570,7 @@ class HandTest {
         @DisplayName("Should mao de onze responder not interfere in playing order")
         void shouldMaoDeOnzeResponderNotInterfereInPlayingOrder() {
             when(player2.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             sut.accept(player2);
             assertThatNoException().isThrownBy(() -> sut.playFirstCard(player1, Card.of(Rank.THREE, Suit.CLUBS)));
         }
@@ -578,7 +579,7 @@ class HandTest {
         @DisplayName("Should not allow to play first card before deciding if plays mao de onze")
         void shouldNotAllowToPlayCardFirstBeforeDecidingIfPlaysMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             assertThatIllegalStateException().isThrownBy(() -> sut.playFirstCard(player1, Card.closed()));
         }
 
@@ -586,7 +587,7 @@ class HandTest {
         @DisplayName("Should not allow to play second card before deciding if plays mao de onze")
         void shouldNotAllowToPlaySecondCardBeforeDecidingIfPlaysMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             assertThatIllegalStateException().isThrownBy(() -> sut.playSecondCard(player1, Card.closed()));
         }
 
@@ -594,7 +595,7 @@ class HandTest {
         @DisplayName("Should not allow to raise bet while deciding if plays mao de onze")
         void shouldNotAllowToRaiseBetWhileDecidingIfPlaysMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             assertThatIllegalStateException().isThrownBy(() -> sut.raise(player1));
         }
 
@@ -602,7 +603,7 @@ class HandTest {
         @DisplayName("Should be able to play card after deciding if plays mao de onze")
         void shouldBeAbleToPlayCardAfterDecidingIfPlaysMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             sut.accept(player1);
             assertThatNoException().isThrownBy(() -> sut.playFirstCard(player1, Card.of(Rank.THREE, Suit.CLUBS)));
         }
@@ -611,7 +612,7 @@ class HandTest {
         @DisplayName("Should hand worth 3 points if player accepts mao de onze")
         void shouldHandWorth3PointsIfPlayerAcceptsMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             sut.accept(player1);
             assertThat(sut.getPoints()).isEqualTo(THREE);
         }
@@ -620,7 +621,7 @@ class HandTest {
         @DisplayName("Should opponent win 1 point if player quits mao de onze")
         void shouldOpponentWin1PointIfPlayerQuitsMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             sut.quit(player1);
             assertThat(sut.getResult().orElse(null)).isEqualTo(HandResult.of(player2, ONE));
         }
@@ -629,7 +630,7 @@ class HandTest {
         @DisplayName("Should hand be done after player quits mao de onze")
         void shouldHandBeDoneAfterPlayerQuitsMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             sut.quit(player1);
             assertThat(sut.isDone()).isTrue();
         }
@@ -639,7 +640,7 @@ class HandTest {
         void shouldNotBeAbleToRaiseBetWhenAnyUserHas11Points() {
             when(player1.getScore()).thenReturn(11);
             when(player2.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             EnumSet<PossibleAction> possibleActions = EnumSet.of(PLAY);
             assertThat(sut.getPossibleActions()).isEqualTo(possibleActions);
         }
@@ -668,7 +669,7 @@ class HandTest {
         @DisplayName("Should current player be able only to accept or quit when hand begins in mao de onze")
         void shouldCurrentPlayerBeAbleOnlyToAcceptOrQuitWhenHandBeginsInMaoDeOnze() {
             when(player1.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             EnumSet<PossibleAction> possibleActions = EnumSet.of(ACCEPT, QUIT);
             assertThat(sut.getPossibleActions()).isEqualTo(possibleActions);
         }
@@ -677,7 +678,7 @@ class HandTest {
         @DisplayName("Should current player only be able to play after responder accepts mao de onze")
         void shouldCurrentPlayerOnlyBeAbleToPlayAfterResponderAcceptsMaoDeOnze() {
             when(player2.getScore()).thenReturn(11);
-            sut = new Hand(player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
+            sut = new Hand(UUID.randomUUID(), player1, player2, Card.of(Rank.SEVEN, Suit.CLUBS));
             sut.accept(player2);
             EnumSet<PossibleAction> possibleActions = EnumSet.of(PLAY);
             assertThat(sut.getPossibleActions()).isEqualTo(possibleActions);
@@ -693,7 +694,7 @@ class HandTest {
         void shouldNotAcceptNullParametersInAnyExternalRequest() {
             final Class<NullPointerException> exception = NullPointerException.class;
             SoftAssertions softly = new SoftAssertions();
-            softly.assertThatThrownBy(() -> new Hand(null, null, null)).isInstanceOf(exception);
+            softly.assertThatThrownBy(() -> new Hand(null, null, null, null)).isInstanceOf(exception);
             softly.assertThatThrownBy(() -> sut.playFirstCard(null, Card.closed())).isInstanceOf(exception);
             softly.assertThatThrownBy(() -> sut.playFirstCard(player1, null)).isInstanceOf(exception);
             softly.assertThatThrownBy(() -> sut.playSecondCard(null, Card.closed())).isInstanceOf(exception);
