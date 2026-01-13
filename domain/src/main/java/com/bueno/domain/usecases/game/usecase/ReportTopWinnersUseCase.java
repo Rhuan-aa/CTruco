@@ -20,6 +20,7 @@
 
 package com.bueno.domain.usecases.game.usecase;
 
+import com.bueno.domain.usecases.game.dtos.PlayerWinrateDto;
 import com.bueno.domain.usecases.game.dtos.PlayerWinsDto;
 import com.bueno.domain.usecases.game.dtos.TopWinnersDto;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
@@ -30,14 +31,13 @@ import java.util.List;
 @Service
 public class ReportTopWinnersUseCase {
 
-    private final GameResultRepository resultRepository;
+    private final ReportWinrateUseCase reportWinrateUseCase;
 
-    public ReportTopWinnersUseCase(GameResultRepository resultRepository) {
-        this.resultRepository = resultRepository;
+    public ReportTopWinnersUseCase(ReportWinrateUseCase reportWinrateUseCase) {
+        this.reportWinrateUseCase = reportWinrateUseCase;
     }
 
-    public TopWinnersDto create(int numberOfTopPlayers){
-        final List<PlayerWinsDto> topWinners = resultRepository.findTopWinners(numberOfTopPlayers);
-        return new TopWinnersDto(topWinners);
+    public List<PlayerWinrateDto> create(int numberOfTopPlayers){
+        return reportWinrateUseCase.createWinrateList().stream().limit(numberOfTopPlayers).toList();
     }
 }
