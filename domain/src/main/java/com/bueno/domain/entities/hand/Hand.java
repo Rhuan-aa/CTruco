@@ -32,6 +32,7 @@ import java.util.*;
 
 public class Hand {
 
+    private final UUID gameId;
     private final Card vira;
     private final List<Card> dealtCards;
     private final List<Card> openCards;
@@ -54,10 +55,11 @@ public class Hand {
 
     //This method must only be used to recovery the object state from database. Do not use for creating a new hand.
     //To create a hand, use the Game class, since it is its bounded context border.
-    public Hand(Card vira, List<Card> dealtCards, List<Card> openCards, List<Round> roundsPlayed, List<Intel> history,
+    public Hand(UUID gameId, Card vira, List<Card> dealtCards, List<Card> openCards, List<Round> roundsPlayed, List<Intel> history,
                 EnumSet<PossibleAction> possibleActions, Player firstToPlay, Player lastToPlay, Player currentPlayer,
                 Player lastBetRaiser, Player eventPlayer, Card cardToPlayAgainst, HandPoints points,
                 HandPoints pointsProposal, HandResult result, String stateName){
+        this.gameId = gameId;
         this.vira = vira;
         this.dealtCards = new ArrayList<>(dealtCards);
         this.openCards = new ArrayList<>(openCards);
@@ -87,7 +89,9 @@ public class Hand {
         };
     }
 
-    public Hand(Player firstToPlay, Player lastToPlay, Card vira){
+    public Hand(UUID gameId, Player firstToPlay, Player lastToPlay, Card vira){
+        this.gameId = gameId;
+
         this.firstToPlay = Objects.requireNonNull(firstToPlay);
         this.lastToPlay = Objects.requireNonNull(lastToPlay);
         this.vira = Objects.requireNonNull(vira);
@@ -339,6 +343,10 @@ public class Hand {
 
     public HandPoints getPointsProposal() {
         return pointsProposal;
+    }
+
+    public UUID getGameId() {
+        return gameId;
     }
 
     public boolean canRaiseBet(){

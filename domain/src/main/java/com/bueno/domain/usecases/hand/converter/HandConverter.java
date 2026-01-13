@@ -45,6 +45,7 @@ public class HandConverter {
     public static HandDto toDto(Hand hand){
         if(hand == null) return  null;
         return new HandDto(
+                hand.getGameId(),
                 CardConverter.toDto(hand.getVira()),
                 hand.getDealtCards().stream().map(CardConverter::toDto).toList(),
                 hand.getOpenCards().stream().map(CardConverter::toDto).toList(),
@@ -81,6 +82,7 @@ public class HandConverter {
                 .toList();
 
         return new Hand(
+                dto.gameId(),
                 CardConverter.fromDto(dto.vira()),
                 dto.dealtCards().stream().map(CardConverter::fromDto).toList(),
                 dto.openCards().stream().map(CardConverter::fromDto).toList(),
@@ -95,8 +97,7 @@ public class HandConverter {
                 CardConverter.fromDto(dto.cartToPlayAgainst()),
                 HandPoints.fromIntValue(dto.points()),
                 dto.pointsProposal() != 0 ? HandPoints.fromIntValue(dto.pointsProposal()) : null,
-                handResultFromDto(dto),
-                dto.state());
+                handResultFromDto(dto), dto.state());
     }
 
     private static HandResult handResultFromDto(HandDto dto) {

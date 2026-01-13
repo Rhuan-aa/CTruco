@@ -25,8 +25,8 @@ import com.bueno.domain.usecases.game.dtos.PlayerDto;
 import java.time.Instant;
 import java.util.*;
 
-public record IntelDto(Instant timestamp, boolean isGameDone, UUID gameWinner, boolean isMaoDeOnze,
-                       Integer handPoints, Integer handPointsProposal,
+public record IntelDto(UUID gameId, Instant timestamp, boolean isGameDone, UUID gameWinner,
+                       boolean isMaoDeOnze, Integer handPoints, Integer handPointsProposal,
                        List<Optional<String>> roundWinnersUsernames,
                        List<Optional<UUID>> roundWinnersUuid, int roundsPlayed,
                        CardDto vira,

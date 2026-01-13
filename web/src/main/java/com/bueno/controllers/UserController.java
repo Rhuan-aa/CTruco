@@ -22,6 +22,7 @@ package com.bueno.controllers;
 
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.game.usecase.ReportTopWinnersUseCase;
+import com.bueno.domain.usecases.game.usecase.ReportWinrateUseCase;
 import com.bueno.domain.usecases.game.usecase.UserRecordUseCase;
 import com.bueno.domain.usecases.game.dtos.UserRecordDto;
 import com.bueno.domain.usecases.user.FindUserUseCase;
@@ -46,14 +47,14 @@ public class UserController {
     private final FindUserUseCase findUserUseCase;
     private final UserRecordUseCase userRecordUseCase;
     private final PasswordEncoder encoder;
-    private final GameResultRepository gameResultRepository;
+    private final ReportWinrateUseCase reportWinrateUseCase;
 
-    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder, GameResultRepository gameResultRepository) {
+    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder, ReportWinrateUseCase reportWinrateUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.findUserUseCase = findUserUseCase;
         this.userRecordUseCase = userRecordUseCase;
         this.encoder = encoder;
-        this.gameResultRepository = gameResultRepository;
+        this.reportWinrateUseCase = reportWinrateUseCase;
     }
 
     @PostMapping(path = "/register")
@@ -66,23 +67,6 @@ public class UserController {
 
         final var response = registerUserUseCase.create(encodedPasswordRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    @GetMapping(path = "/api/v1/users/top-winners")
-    private ResponseEntity<?> topWinners() {
-        try {
-            ReportTopWinnersUseCase useCase = new ReportTopWinnersUseCase(gameResultRepository);
-            var response = useCase.create(5);
-            return new ResponseBuilder(HttpStatus.OK)
-                    .addEntry(new ResponseEntry("topWinners", response))
-                    .addTimestamp()
-                    .build();
-        } catch (Exception e) {
-            return new ResponseBuilder(HttpStatus.NOT_FOUND)
-                    .addEntry(new ResponseEntry("error", "the server couldn't found the top winners"))
-                    .addTimestamp()
-                    .build();
-        }
     }
 
     @GetMapping(path = "/api/v1/users/{uuid}")

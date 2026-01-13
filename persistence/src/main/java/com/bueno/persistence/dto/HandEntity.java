@@ -82,16 +82,17 @@ public class HandEntity {
                 .build();
     }
 
-    public HandDto toDto(Map<UUID, PlayerDto> players){
+    public HandDto toDto(UUID gameId, Map<UUID, PlayerDto> players){
         final Function<String, CardDto> toCardDto = card -> card != null?
                 new CardDto(card.substring(0, 1), card.substring(1, 2)) : null;
         final Function<UUID, PlayerDto> toPlayerDtoOrNull = uuid -> uuid != null ? players.get(uuid) : null;
         return new HandDto(
+                gameId,
                 toCardDto.apply(vira),
                 dealtCard.stream().map(toCardDto).toList(),
                 openCards.stream().map(toCardDto).toList(),
                 roundsPlayed,
-                history.stream().map(IntelEntity::toDto).toList(),
+                history.stream().map(intel -> intel.toDto(gameId)).toList(),
                 possibleActions,
                 players.get(firstToPlay),
                 players.get(lastToPlay),

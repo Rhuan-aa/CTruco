@@ -21,6 +21,10 @@
 package com.bueno.auth.jwt;
 
 import com.bueno.auth.security.ApplicationUser;
+import com.bueno.domain.usecases.session.dtos.SessionDto;
+import com.bueno.domain.usecases.session.usecase.CreateSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.FindSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.RefreshSessionUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,12 +50,19 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     private final AuthenticationManager authenticationManager;
     private final JwtProperties jwtProperties;
     private final JwtTokenHelper jwtTokenHelper;
+    private final CreateSessionUseCase createSessionUseCase;
+    private final FindSessionUseCase findSessionUseCase;
+    private final RefreshSessionUseCase refreshSessionUseCase;
 
     public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authenticationManager,
-                                                      JwtProperties jwtProperties, JwtTokenHelper jwtTokenHelper) {
+                                                      JwtProperties jwtProperties, JwtTokenHelper jwtTokenHelper, CreateSessionUseCase createSessionUseCase, FindSessionUseCase findSessionUseCase, RefreshSessionUseCase refreshSessionUseCase) {
         this.authenticationManager = authenticationManager;
         this.jwtProperties = jwtProperties;
         this.jwtTokenHelper = jwtTokenHelper;
+        this.createSessionUseCase = createSessionUseCase;
+
+        this.findSessionUseCase = findSessionUseCase;
+        this.refreshSessionUseCase = refreshSessionUseCase;
     }
 
     @Override
@@ -87,6 +98,15 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
         final Cookie refreshToken = jwtTokenHelper.createRefreshTokenCookie(user, issuer);
         response.addCookie(refreshToken);
+        final var uuid = user.getUuid();
+
+        if (findSessionUseCase.findSessionByPlayerUuid(uuid) == null) {
+            createSessionUseCase.createSessionForUser(uuid);
+        } else {
+            refreshSessionUseCase.refreshSession(uuid);
+        }
+
+        log.info("Created session for: {}", uuid);
 
         final Map<String, String> body = new HashMap<>();
         body.put("uuid", user.getUuid().toString());
