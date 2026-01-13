@@ -32,11 +32,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -67,6 +63,36 @@ public class GameResultRepositoryImpl implements GameResultRepository {
             System.err.println(e.getClass() + ": " + e.getMessage() + "| GameResult couldn't be saved");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public List<GameResultUsernamesDto> findAll() {
+        String sql = """
+                SELECT
+                       game.game_uuid     AS game_uuid,
+                       game.game_end      AS ending,
+                       game.game_start    as start,
+                       game.player1_score AS player1_score,
+                       game.player2_score AS player2_score,
+                       player1.username   AS player1,
+                       player2.username   AS player2,
+                       winner.username    AS winner
+                FROM game_result game
+                         JOIN
+                     app_user player1 ON game.player1_uuid = player1.uuid
+                         JOIN
+                     app_user player2 ON game.player2_uuid = player2.uuid
+                         JOIN
+                     app_user winner ON game.winner_uuid = winner.uuid;
+                """;
+        try (PreparedStatement statement = ConnectionFactory.createPreparedStatement(sql)) {
+            List<GameResultQR> gameResultList = new ArrayList<>();
+            return getGameResultUsernamesDtos(statement, gameResultList);
+        } catch (SQLException e) {
+            System.err.println(e.getClass() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return List.of();
     }
 
     @Override
@@ -124,29 +150,7 @@ public class GameResultRepositoryImpl implements GameResultRepository {
             List<GameResultQR> gameResults = new ArrayList<>();
             statement.setObject(1, uuid);
             statement.setObject(2, uuid);
-            ResultSet res = statement.executeQuery();
-            while (res.next()) gameResults.add(new GameResultQR(
-                    res.getObject("game_uuid", UUID.class),
-                    res.getObject("ending", LocalDateTime.class),
-                    res.getObject("start", LocalDateTime.class),
-                    res.getInt("player1_score"),
-                    res.getInt("player2_score"),
-                    res.getString("player1"),
-                    res.getString("player2"),
-                    res.getString("winner")
-            ));
-            return gameResults.stream().map(r -> new GameResultUsernamesDto(
-                            r.gameId(),
-                            dateTimeFormatter(r.ending().toLocalDate(), r.ending().getHour(), r.ending().getMinute()),
-                            dateTimeFormatter(r.start().toLocalDate(), r.start().getHour(), r.start().getMinute()),
-                            r.start().until(r.ending(), ChronoUnit.SECONDS),
-                            r.p1Score(),
-                            r.p2Score(),
-                            r.p1Name(),
-                            r.p2Name(),
-                            r.winner()
-                    ))
-                    .toList();
+            return getGameResultUsernamesDtos(statement, gameResults);
 
         } catch (SQLException e) {
             System.err.println(e.getClass() + ": " + e.getMessage());
@@ -154,6 +158,32 @@ public class GameResultRepositoryImpl implements GameResultRepository {
         }
         return List.of();
 
+    }
+
+    private List<GameResultUsernamesDto> getGameResultUsernamesDtos(PreparedStatement statement, List<GameResultQR> gameResultList) throws SQLException {
+        ResultSet res = statement.executeQuery();
+        while (res.next()) gameResultList.add(new GameResultQR(
+                res.getObject("game_uuid", UUID.class),
+                res.getObject("ending", LocalDateTime.class),
+                res.getObject("start", LocalDateTime.class),
+                res.getInt("player1_score"),
+                res.getInt("player2_score"),
+                res.getString("player1"),
+                res.getString("player2"),
+                res.getString("winner")
+        ));
+        return gameResultList.stream().map(r -> new GameResultUsernamesDto(
+                        r.gameId(),
+                        dateTimeFormatter(r.ending().toLocalDate(), r.ending().getHour(), r.ending().getMinute()),
+                        dateTimeFormatter(r.start().toLocalDate(), r.start().getHour(), r.start().getMinute()),
+                        r.start().until(r.ending(), ChronoUnit.SECONDS),
+                        r.p1Score(),
+                        r.p2Score(),
+                        r.p1Name(),
+                        r.p2Name(),
+                        r.winner()
+                ))
+                .toList();
     }
 
     private String dateTimeFormatter(LocalDate date, long minute, long hour) {

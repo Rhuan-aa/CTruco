@@ -30,6 +30,8 @@ import java.util.UUID;
 public interface GameResultRepository {
     void save(GameResultDto gameResultDto);
 
+    List<GameResultUsernamesDto> findAll();
+
     List<PlayerWinsDto> findTopWinners(Integer maxNumberOfUsers);
 
     List<GameResultUsernamesDto> findAllByUserUuid(UUID uuid);
