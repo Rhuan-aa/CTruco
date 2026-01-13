@@ -69,23 +69,6 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/api/v1/users/top-winners")
-    private ResponseEntity<?> topWinners() {
-        try {
-            ReportTopWinnersUseCase useCase = new ReportTopWinnersUseCase(reportWinrateUseCase);
-            var response = useCase.create(5);
-            return new ResponseBuilder(HttpStatus.OK)
-                    .addEntry(new ResponseEntry("topWinners", response))
-                    .addTimestamp()
-                    .build();
-        } catch (Exception e) {
-            return new ResponseBuilder(HttpStatus.NOT_FOUND)
-                    .addEntry(new ResponseEntry("error", "the server couldn't found the top winners"))
-                    .addTimestamp()
-                    .build();
-        }
-    }
-
     @GetMapping(path = "/api/v1/users/{uuid}")
     public ResponseEntity<?> find(@PathVariable UUID uuid) {
         final var response = findUserUseCase.findByUUID(uuid);
