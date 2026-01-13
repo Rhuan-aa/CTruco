@@ -96,34 +96,6 @@ public class GameResultRepositoryImpl implements GameResultRepository {
     }
 
     @Override
-    public List<PlayerWinsDto> findTopWinners(Integer maxNumberOfUsers) {
-        try (Statement statement = ConnectionFactory.createStatement()) {
-            List<PlayerWinsQR> players = new ArrayList<>();
-            ResultSet res = statement.executeQuery("""
-                    SELECT a.username as username, count(a.username) as wins
-                    FROM app_user a
-                    RIGHT JOIN game_result b ON a.uuid = b.winner_uuid
-                    GROUP BY username
-                    ORDER BY username;
-                    """);
-            while (res.next()) players.add(new PlayerWinsQR(
-                    res.getString("username"),
-                    res.getLong("wins")
-            ));
-            return players.stream()
-                    .filter(playerWinsQR -> playerWinsQR.userName() != null && playerWinsQR.wins() > 0)
-                    .map(playerWinsQR -> new PlayerWinsDto(
-                            playerWinsQR.userName(),
-                            playerWinsQR.wins().intValue()))
-                    .toList();
-        } catch (SQLException e) {
-            System.err.println(e.getClass() + ": " + e.getMessage());
-            e.printStackTrace();
-        }
-        return List.of();
-    }
-
-    @Override
     public List<GameResultUsernamesDto> findAllByUserUuid(UUID uuid) {
         String sql = """
                 SELECT
