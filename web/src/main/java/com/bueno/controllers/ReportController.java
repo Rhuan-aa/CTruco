@@ -39,17 +39,27 @@ import java.util.List;
 @RequestMapping(path = "/api/v1/reports")
 public class ReportController {
 
-    private final ReportTopWinnersUseCase reportTopWinnersUseCase;
     private final ReportWinrateUseCase reportWinrateUseCase;
 
-    public ReportController(ReportTopWinnersUseCase reportTopWinnersUseCase, ReportWinrateUseCase reportWinrateUseCase) {
-        this.reportTopWinnersUseCase = reportTopWinnersUseCase;
+    public ReportController(ReportWinrateUseCase reportWinrateUseCase) {
         this.reportWinrateUseCase = reportWinrateUseCase;
     }
 
     @GetMapping(path = "/top-winners/{numberOfTopWinners}")
-    public List<PlayerWinrateDto> topWinners(@PathVariable int numberOfTopWinners){
-        return reportTopWinnersUseCase.create(numberOfTopWinners);
+    private ResponseEntity<?> topWinners(@PathVariable int numberOfTopWinners) {
+        try {
+            ReportTopWinnersUseCase useCase = new ReportTopWinnersUseCase(reportWinrateUseCase);
+            var response = useCase.create(numberOfTopWinners);
+            return new ResponseBuilder(HttpStatus.OK)
+                    .addEntry(new ResponseEntry("topWinners", response))
+                    .addTimestamp()
+                    .build();
+        } catch (Exception e) {
+            return new ResponseBuilder(HttpStatus.NOT_FOUND)
+                    .addEntry(new ResponseEntry("error", "the server couldn't found the top winners"))
+                    .addTimestamp()
+                    .build();
+        }
     }
 
     @GetMapping(path = "/winrate")
