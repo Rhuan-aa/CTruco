@@ -47,14 +47,12 @@ public class UserController {
     private final FindUserUseCase findUserUseCase;
     private final UserRecordUseCase userRecordUseCase;
     private final PasswordEncoder encoder;
-    private final ReportWinrateUseCase reportWinrateUseCase;
 
-    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder, ReportWinrateUseCase reportWinrateUseCase) {
+    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder) {
         this.registerUserUseCase = registerUserUseCase;
         this.findUserUseCase = findUserUseCase;
         this.userRecordUseCase = userRecordUseCase;
         this.encoder = encoder;
-        this.reportWinrateUseCase = reportWinrateUseCase;
     }
 
     @PostMapping(path = "/register")
