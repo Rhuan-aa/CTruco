@@ -20,25 +20,51 @@
 
 package com.bueno.controllers;
 
+import com.bueno.domain.usecases.game.dtos.PlayerWinrateDto;
 import com.bueno.domain.usecases.game.usecase.ReportTopWinnersUseCase;
 import com.bueno.domain.usecases.game.dtos.TopWinnersDto;
+import com.bueno.domain.usecases.game.usecase.ReportWinrateUseCase;
+import com.bueno.responses.ResponseBuilder;
+import com.bueno.responses.ResponseEntry;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/reports")
 public class ReportController {
 
     private final ReportTopWinnersUseCase reportTopWinnersUseCase;
+    private final ReportWinrateUseCase reportWinrateUseCase;
 
-    public ReportController(ReportTopWinnersUseCase reportTopWinnersUseCase) {
+    public ReportController(ReportTopWinnersUseCase reportTopWinnersUseCase, ReportWinrateUseCase reportWinrateUseCase) {
         this.reportTopWinnersUseCase = reportTopWinnersUseCase;
+        this.reportWinrateUseCase = reportWinrateUseCase;
     }
 
     @GetMapping(path = "/top-winners/{numberOfTopWinners}")
-    public TopWinnersDto topWinners(@PathVariable int numberOfTopWinners){
+    public List<PlayerWinrateDto> topWinners(@PathVariable int numberOfTopWinners){
         return reportTopWinnersUseCase.create(numberOfTopWinners);
+    }
+
+    @GetMapping(path = "/winrate")
+    private ResponseEntity<?> winrate() {
+        try {
+            var response = reportWinrateUseCase.createWinrateList();
+            return new ResponseBuilder(HttpStatus.OK)
+                    .addEntry(new ResponseEntry("players_winrate", response))
+                    .addTimestamp()
+                    .build();
+        } catch (Exception e) {
+            return new ResponseBuilder(HttpStatus.NOT_FOUND)
+                    .addEntry(new ResponseEntry("error", "the server couldn't found the winrate"))
+                    .addTimestamp()
+                    .build();
+        }
     }
 }
