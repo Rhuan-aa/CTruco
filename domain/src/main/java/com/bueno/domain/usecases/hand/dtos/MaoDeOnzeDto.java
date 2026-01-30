@@ -1,6 +1,9 @@
 package com.bueno.domain.usecases.hand.dtos;
 
+import java.util.UUID;
+
 public record MaoDeOnzeDto (
+        UUID gameUuid,
         int weakCardValue,
         int mediumCardValue,
         int strongCardValue,

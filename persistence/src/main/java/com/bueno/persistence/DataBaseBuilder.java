@@ -169,19 +169,21 @@ public class DataBaseBuilder {
 
     private String createMaoDeOnzeTable() {
         return """
-                CREATE TABLE IF NOT EXISTS MAO_DE_ONZE(
-                    uuid UUID NOT NULL,
-                    weak_card INTEGER NOT NULL,
-                    medium_card INTEGER NOT NULL,
-                    strong_card INTEGER NOT NULL,
-                    player_type TEXT NOT NULL,
-                    player_points INTEGER NOT NULL,
-                    opponent_points INTEGER NOT NULL,
-                    open_hand BOOLEAN NOT NULL,
-                    hand_winner BOOLEAN NOT NULL,
-                    CONSTRAINT mao_de_onze_uuid_pk PRIMARY KEY (uuid)
-                );
-                """;
+            CREATE TABLE IF NOT EXISTS MAO_DE_ONZE(
+                uuid UUID NOT NULL,
+                game_uuid UUID NOT NULL,
+                weak_card INTEGER NOT NULL,
+                medium_card INTEGER NOT NULL,
+                strong_card INTEGER NOT NULL,
+                player_type TEXT NOT NULL,
+                player_points INTEGER NOT NULL,
+                opponent_points INTEGER NOT NULL,
+                open_hand BOOLEAN NOT NULL,
+                hand_winner BOOLEAN NOT NULL,
+                CONSTRAINT mao_de_onze_uuid_pk PRIMARY KEY (uuid),
+                CONSTRAINT fk_mao_de_onze_game FOREIGN KEY (game_uuid) REFERENCES GAME_RESULT(uuid) ON DELETE CASCADE
+            );
+            """;
     }
 
     private String createPlayedCardTable() {
@@ -207,25 +209,27 @@ public class DataBaseBuilder {
 
     private String createIncreasePointsTable() {
         return """
-                CREATE TABLE IF NOT EXISTS INCREASE_POINTS (
-                    uuid UUID NOT NULL,
-                    weak_card INTEGER NOT NULL,
-                    medium_card INTEGER NOT NULL,
-                    strong_card INTEGER NOT NULL,
-                    player_type TEXT NOT NULL,
-                    open_hand BOOLEAN NOT NULL,
-                    pile INTEGER[] NOT NULL,
-                    winner_r1 TEXT NOT NULL,
-                    winner_r2 TEXT NOT NULL,
-                    winner_r3 TEXT NOT NULL,
-                    player_points INTEGER NOT NULL,
-                    opponent_points INTEGER NOT NULL,
-                    hand_value INTEGER NOT NULL,
-                    opponent_accepted INTEGER NOT NULL,
-                    general_score_impact INTEGER NOT NULL,
-                    CONSTRAINT increase_points_pk PRIMARY KEY (uuid)
-                );
-                """;
+            CREATE TABLE IF NOT EXISTS INCREASE_POINTS (
+                uuid UUID NOT NULL,
+                game_uuid UUID NOT NULL,
+                weak_card INTEGER NOT NULL,
+                medium_card INTEGER NOT NULL,
+                strong_card INTEGER NOT NULL,
+                player_type TEXT NOT NULL,
+                open_hand BOOLEAN NOT NULL,
+                pile INTEGER[] NOT NULL,
+                winner_r1 TEXT NOT NULL,
+                winner_r2 TEXT NOT NULL,
+                winner_r3 TEXT NOT NULL,
+                player_points INTEGER NOT NULL,
+                opponent_points INTEGER NOT NULL,
+                hand_value INTEGER NOT NULL,
+                opponent_accepted INTEGER NOT NULL,
+                general_score_impact INTEGER NOT NULL,
+                CONSTRAINT increase_points_pk PRIMARY KEY (uuid)
+                CONSTRAINT fk_increase_points_game FOREIGN KEY (game_uuid) REFERENCES GAME_RESULT(uuid) ON DELETE CASCADE
+            );
+            """;
     }
 
 //    private String createTournamentTable() {
