@@ -20,36 +20,49 @@
 
 package com.bueno.domain.usecases.hand;
 
+import com.bueno.domain.entities.deck.Card;
 import com.bueno.domain.entities.game.Game;
-import com.bueno.domain.usecases.game.converter.GameResultConverter;
+import com.bueno.domain.entities.hand.Hand;
+import com.bueno.domain.entities.hand.HandResult;
+import com.bueno.domain.entities.player.Player;
 import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
-import com.bueno.domain.usecases.game.usecase.SaveGameResultUseCase;
 import com.bueno.domain.usecases.hand.converter.HandResultConverter;
+import com.bueno.domain.usecases.hand.converter.MaoDeOnzeConverter;
+import com.bueno.domain.usecases.hand.dtos.MaoDeOnzeDto;
+import com.bueno.domain.usecases.hand.repos.HandResultRepository;
+import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
 import com.bueno.domain.usecases.intel.dtos.IntelDto;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 class ResultHandler {
 
-    private final GameRepository gameRepository;
-    private final GameResultRepository gameResultRepository;
     private final HandResultRepository handResultRepository;
+    private final MaoDeOnzeRepository maoDeOnzeRepository;
 
-    ResultHandler(GameRepository gameRepository, GameResultRepository gameResultRepository, HandResultRepository handResultRepository) {
-        this.gameRepository = gameRepository;
-        this.gameResultRepository = gameResultRepository;
+    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository) {
+        this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.handResultRepository = handResultRepository;
     }
 
     IntelDto handle(Game game) {
         game.currentHand().getResult().ifPresent(unused -> {
-            if (handResultRepository != null) handResultRepository.save(HandResultConverter.of(game));
+            if (handResultRepository != null) {
+                handResultRepository.save(HandResultConverter.of(game));
+
+                if (game.currentHand().isMaoDeOnze()) {
+                    final var dto = MaoDeOnzeConverter.of(game);
+                    maoDeOnzeRepository.save(dto);
+                }
+            }
             updateGameStatus(game);
         });
 
         if (game.isDone()) {
-//            SaveGameResultUseCase usecase = new SaveGameResultUseCase(gameRepository, gameResultRepository);
-//            usecase.save(GameResultConverter.toDto(game));
             return IntelConverter.toDto(game.getIntel());
         }
         return null;
