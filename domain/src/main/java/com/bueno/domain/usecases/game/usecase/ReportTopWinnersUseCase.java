@@ -21,9 +21,6 @@
 package com.bueno.domain.usecases.game.usecase;
 
 import com.bueno.domain.usecases.game.dtos.PlayerWinrateDto;
-import com.bueno.domain.usecases.game.dtos.PlayerWinsDto;
-import com.bueno.domain.usecases.game.dtos.TopWinnersDto;
-import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
