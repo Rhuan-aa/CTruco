@@ -23,6 +23,7 @@ public class MaoDeOnzeConverter {
         cards.sort(Comparator.comparingInt(c -> c.getRelativeValue(vira)));
 
         return new MaoDeOnzeDto(
+                game.getUuid(),
                 !cards.isEmpty() ? cards.get(0).getRelativeValue(vira) : 0,
                 cards.size() > 1 ? cards.get(1).getRelativeValue(vira) : 0,
                 cards.size() > 2 ? cards.get(2).getRelativeValue(vira) : 0,
