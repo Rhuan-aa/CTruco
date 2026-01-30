@@ -17,6 +17,9 @@ public class DataBaseBuilder {
             statement.addBatch(createRankBotsTable());
             statement.addBatch(createSessionTable());
             statement.addBatch(createInviteTable());
+            statement.addBatch(createMaoDeOnzeTable());
+            statement.addBatch(createPlayedCardTable());
+            statement.addBatch(createIncreasePointsTable());
 //            statement.addBatch(createTournamentTable());
 //            statement.addBatch(createTournamentParticipantsTable());
 //            statement.addBatch(createTournamentMatchesTable());
@@ -38,6 +41,9 @@ public class DataBaseBuilder {
             statement.addBatch("DROP TABLE IF EXISTS session");
             statement.addBatch("DROP TABLE IF EXISTS invite");
             statement.addBatch("DROP TABLE IF EXISTS app_user");
+            statement.addBatch("DROP TABLE IF EXISTS mao_de_onze");
+            statement.addBatch("DROP TABLE IF EXISTS played_card");
+            statement.addBatch("DROP TABLE IF EXISTS increase_points");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament_participant");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament_match");
@@ -157,6 +163,67 @@ public class DataBaseBuilder {
                     CONSTRAINT invited_player_uuid_fk FOREIGN KEY (invited_player_uuid) REFERENCES app_user(uuid),
                     CONSTRAINT self_invite_ck CHECK (host_player_uuid <> invited_player_uuid),
                     CONSTRAINT invite_pair_uk UNIQUE (host_player_uuid, invited_player_uuid)
+                );
+                """;
+    }
+
+    private String createMaoDeOnzeTable() {
+        return """
+                CREATE TABLE IF NOT EXISTS MAO_DE_ONZE(
+                    uuid UUID NOT NULL,
+                    weak_card INTEGER NOT NULL,
+                    medium_card INTEGER NOT NULL,
+                    strong_card INTEGER NOT NULL,
+                    player_type TEXT NOT NULL,
+                    player_points INTEGER NOT NULL,
+                    opponent_points INTEGER NOT NULL,
+                    open_hand BOOLEAN NOT NULL,
+                    hand_winner BOOLEAN NOT NULL,
+                    CONSTRAINT mao_de_onze_uuid_pk PRIMARY KEY (uuid)
+                );
+                """;
+    }
+
+    private String createPlayedCardTable() {
+        return """
+                CREATE TABLE IF NOT EXISTS PLAYED_CARD (
+                    uuid UUID NOT NULL,
+                    weak_card INTEGER NOT NULL,
+                    medium_card INTEGER NOT NULL,
+                    strong_card INTEGER NOT NULL,
+                    player_type TEXT NOT NULL,
+                    open_card BOOLEAN NOT NULL,
+                    deck_pile INTEGER NOT NULL,
+                    round_number INTEGER NOT NULL,
+                    winner_r1 NUMERIC(2,1) NOT NULL,
+                    winner_r2 NUMERIC(2,1) NOT NULL,
+                    winner_r3 NUMERIC(2,1) NOT NULL,
+                    hand_winner BOOLEAN NOT NULL,
+                    choice TEXT NOT NULL,
+                    CONSTRAINT play_card_pk PRIMARY KEY (uuid)
+                );
+                """;
+    }
+
+    private String createIncreasePointsTable() {
+        return """
+                CREATE TABLE IF NOT EXISTS INCREASE_POINTS (
+                    uuid UUID NOT NULL,
+                    weak_card INTEGER NOT NULL,
+                    medium_card INTEGER NOT NULL,
+                    strong_card INTEGER NOT NULL,
+                    player_type TEXT NOT NULL,
+                    open_hand BOOLEAN NOT NULL,
+                    pile INTEGER[] NOT NULL,
+                    winner_r1 TEXT NOT NULL,
+                    winner_r2 TEXT NOT NULL,
+                    winner_r3 TEXT NOT NULL,
+                    player_points INTEGER NOT NULL,
+                    opponent_points INTEGER NOT NULL,
+                    hand_value INTEGER NOT NULL,
+                    opponent_accepted INTEGER NOT NULL,
+                    general_score_impact INTEGER NOT NULL,
+                    CONSTRAINT increase_points_pk PRIMARY KEY (uuid)
                 );
                 """;
     }

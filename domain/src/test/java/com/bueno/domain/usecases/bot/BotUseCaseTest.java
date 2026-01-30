@@ -34,7 +34,7 @@ import com.bueno.domain.usecases.bot.repository.RemoteBotRepository;
 import com.bueno.domain.usecases.bot.usecase.BotUseCase;
 import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
-import com.bueno.domain.usecases.hand.HandResultRepository;
+import com.bueno.domain.usecases.hand.repos.HandResultRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
