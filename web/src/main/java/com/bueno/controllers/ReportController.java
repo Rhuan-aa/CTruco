@@ -20,9 +20,7 @@
 
 package com.bueno.controllers;
 
-import com.bueno.domain.usecases.game.dtos.PlayerWinrateDto;
 import com.bueno.domain.usecases.game.usecase.ReportTopWinnersUseCase;
-import com.bueno.domain.usecases.game.dtos.TopWinnersDto;
 import com.bueno.domain.usecases.game.usecase.ReportWinrateUseCase;
 import com.bueno.responses.ResponseBuilder;
 import com.bueno.responses.ResponseEntry;
@@ -32,8 +30,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/reports")
