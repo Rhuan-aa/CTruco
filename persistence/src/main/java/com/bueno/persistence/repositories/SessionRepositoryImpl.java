@@ -85,8 +85,8 @@ public class SessionRepositoryImpl implements SessionRepository {
                      WHERE gr.winner_uuid = player.uuid) AS player_score
                 FROM
                     app_user player
-                LEFT JOIN
-                    session ON player.uuid = session.player_uuid AND session.expires_at = ?
+                INNER JOIN
+                    session ON player.uuid = session.player_uuid AND session.expires_at >= ?
                 WHERE
                     NOT EXISTS (SELECT 1 FROM invite WHERE invite.host_player_uuid = player.uuid)
                     AND NOT EXISTS (SELECT 1 FROM invite WHERE invite.invited_player_uuid = player.uuid)

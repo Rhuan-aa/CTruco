@@ -45,7 +45,7 @@ public class Session {
     }
 
     public void reloadExpiration() {
-        this.expiresAt = Instant.now().plus(2, ChronoUnit.MINUTES);
+        this.expiresAt = Instant.now().plus(3, ChronoUnit.MINUTES);
     }
 
     public static SessionDto toDto(Session session) {
