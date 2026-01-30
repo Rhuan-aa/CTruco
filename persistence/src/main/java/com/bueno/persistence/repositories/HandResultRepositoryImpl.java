@@ -20,7 +20,7 @@
 
 package com.bueno.persistence.repositories;
 
-import com.bueno.domain.usecases.hand.HandResultRepository;
+import com.bueno.domain.usecases.hand.repos.HandResultRepository;
 import com.bueno.domain.usecases.hand.dtos.HandResultDto;
 import com.bueno.persistence.ConnectionFactory;
 import org.springframework.stereotype.Repository;

@@ -28,4 +28,5 @@ module domain {
     exports com.bueno.domain.usecases.session.repos;
     exports com.bueno.domain.usecases.invite.dtos;
     exports com.bueno.domain.usecases.invite.repos;
+    exports com.bueno.domain.usecases.hand.repos;
 }
