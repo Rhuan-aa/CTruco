@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
 
 public class IncreasePointsConverter {
 
-    public static List<IncreasePointsDto> ofHand(Hand hand, Game game) {
+    public static List<IncreasePointsDto> of(Game game) {
+        Hand hand = game.currentHand();
         List<IncreasePointsDto> roundDtos = new ArrayList<>();
         List<Round> rounds = hand.getRoundsPlayed();
 
