@@ -24,9 +24,11 @@ import com.bueno.domain.entities.game.Game;
 import com.bueno.domain.usecases.hand.converter.HandResultConverter;
 import com.bueno.domain.usecases.hand.converter.IncreasePointsConverter;
 import com.bueno.domain.usecases.hand.converter.MaoDeOnzeConverter;
+import com.bueno.domain.usecases.hand.converter.PlayedCardConverter;
 import com.bueno.domain.usecases.hand.repos.HandResultRepository;
 import com.bueno.domain.usecases.hand.repos.IncreasePointsRepository;
 import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
+import com.bueno.domain.usecases.hand.repos.PlayedCardRepository;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
 import com.bueno.domain.usecases.intel.dtos.IntelDto;
 
@@ -35,11 +37,13 @@ class ResultHandler {
     private final HandResultRepository handResultRepository;
     private final MaoDeOnzeRepository maoDeOnzeRepository;
     private final IncreasePointsRepository increasePointsRepository;
+    private final PlayedCardRepository playedCardRepository;
 
-    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, IncreasePointsRepository increasePointsRepository) {
+    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, IncreasePointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
         this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.handResultRepository = handResultRepository;
         this.increasePointsRepository = increasePointsRepository;
+        this.playedCardRepository = playedCardRepository;
     }
 
     IntelDto handle(Game game) {
@@ -54,7 +58,11 @@ class ResultHandler {
             }
 
             if (increasePointsRepository != null) {
-                IncreasePointsConverter.ofHand(game.currentHand(), game).forEach(increasePointsRepository::save);
+                IncreasePointsConverter.of(game).forEach(increasePointsRepository::save);
+            }
+
+            if (playedCardRepository != null) {
+                PlayedCardConverter.of(game).forEach(playedCardRepository::save);
             }
 
             updateGameStatus(game);
