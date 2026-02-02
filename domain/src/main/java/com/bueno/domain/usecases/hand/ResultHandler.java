@@ -20,33 +20,26 @@
 
 package com.bueno.domain.usecases.hand;
 
-import com.bueno.domain.entities.deck.Card;
 import com.bueno.domain.entities.game.Game;
-import com.bueno.domain.entities.hand.Hand;
-import com.bueno.domain.entities.hand.HandResult;
-import com.bueno.domain.entities.player.Player;
-import com.bueno.domain.usecases.game.repos.GameRepository;
-import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.hand.converter.HandResultConverter;
+import com.bueno.domain.usecases.hand.converter.IncreasePointsConverter;
 import com.bueno.domain.usecases.hand.converter.MaoDeOnzeConverter;
-import com.bueno.domain.usecases.hand.dtos.MaoDeOnzeDto;
 import com.bueno.domain.usecases.hand.repos.HandResultRepository;
+import com.bueno.domain.usecases.hand.repos.IncreasePointsRepository;
 import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
 import com.bueno.domain.usecases.intel.dtos.IntelDto;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 class ResultHandler {
 
     private final HandResultRepository handResultRepository;
     private final MaoDeOnzeRepository maoDeOnzeRepository;
+    private final IncreasePointsRepository increasePointsRepository;
 
-    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository) {
+    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, IncreasePointsRepository increasePointsRepository) {
         this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.handResultRepository = handResultRepository;
+        this.increasePointsRepository = increasePointsRepository;
     }
 
     IntelDto handle(Game game) {
@@ -59,6 +52,11 @@ class ResultHandler {
                     maoDeOnzeRepository.save(dto);
                 }
             }
+
+            if (increasePointsRepository != null) {
+                IncreasePointsConverter.ofHand(game.currentHand(), game).forEach(increasePointsRepository::save);
+            }
+
             updateGameStatus(game);
         });
 

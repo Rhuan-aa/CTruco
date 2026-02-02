@@ -35,15 +35,15 @@ public class DataBaseBuilder {
 
     private void dropDatabases() throws SQLException {
         try (Statement statement = ConnectionFactory.createStatement()) {
-            statement.addBatch("DROP TABLE IF EXISTS remote_bot");
+            statement.addBatch("DROP TABLE IF EXISTS increase_points");
+            statement.addBatch("DROP TABLE IF EXISTS mao_de_onze");
+            statement.addBatch("DROP TABLE IF EXISTS played_card");
             statement.addBatch("DROP TABLE IF EXISTS hand_result");
             statement.addBatch("DROP TABLE IF EXISTS game_result");
+            statement.addBatch("DROP TABLE IF EXISTS remote_bot");
             statement.addBatch("DROP TABLE IF EXISTS session");
             statement.addBatch("DROP TABLE IF EXISTS invite");
             statement.addBatch("DROP TABLE IF EXISTS app_user");
-            statement.addBatch("DROP TABLE IF EXISTS mao_de_onze");
-            statement.addBatch("DROP TABLE IF EXISTS played_card");
-            statement.addBatch("DROP TABLE IF EXISTS increase_points");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament_participant");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament_match");
@@ -180,56 +180,55 @@ public class DataBaseBuilder {
                 opponent_points INTEGER NOT NULL,
                 open_hand BOOLEAN NOT NULL,
                 hand_winner BOOLEAN NOT NULL,
-                CONSTRAINT mao_de_onze_uuid_pk PRIMARY KEY (uuid),
-                CONSTRAINT fk_mao_de_onze_game FOREIGN KEY (game_uuid) REFERENCES GAME_RESULT(uuid) ON DELETE CASCADE
+                CONSTRAINT mao_de_onze_uuid_pk PRIMARY KEY (uuid)
             );
-            """;
+        """;
     }
 
     private String createPlayedCardTable() {
         return """
-                CREATE TABLE IF NOT EXISTS PLAYED_CARD (
-                    uuid UUID NOT NULL,
-                    weak_card INTEGER NOT NULL,
-                    medium_card INTEGER NOT NULL,
-                    strong_card INTEGER NOT NULL,
-                    player_type TEXT NOT NULL,
-                    open_card BOOLEAN NOT NULL,
-                    deck_pile INTEGER NOT NULL,
-                    round_number INTEGER NOT NULL,
-                    winner_r1 NUMERIC(2,1) NOT NULL,
-                    winner_r2 NUMERIC(2,1) NOT NULL,
-                    winner_r3 NUMERIC(2,1) NOT NULL,
-                    hand_winner BOOLEAN NOT NULL,
-                    choice TEXT NOT NULL,
-                    CONSTRAINT play_card_pk PRIMARY KEY (uuid)
-                );
-                """;
-    }
-
-    private String createIncreasePointsTable() {
-        return """
-            CREATE TABLE IF NOT EXISTS INCREASE_POINTS (
+            CREATE TABLE IF NOT EXISTS PLAYED_CARD (
                 uuid UUID NOT NULL,
                 game_uuid UUID NOT NULL,
                 weak_card INTEGER NOT NULL,
                 medium_card INTEGER NOT NULL,
                 strong_card INTEGER NOT NULL,
                 player_type TEXT NOT NULL,
-                open_hand BOOLEAN NOT NULL,
-                pile INTEGER[] NOT NULL,
-                winner_r1 TEXT NOT NULL,
-                winner_r2 TEXT NOT NULL,
-                winner_r3 TEXT NOT NULL,
-                player_points INTEGER NOT NULL,
-                opponent_points INTEGER NOT NULL,
-                hand_value INTEGER NOT NULL,
-                opponent_accepted INTEGER NOT NULL,
-                general_score_impact INTEGER NOT NULL,
-                CONSTRAINT increase_points_pk PRIMARY KEY (uuid)
-                CONSTRAINT fk_increase_points_game FOREIGN KEY (game_uuid) REFERENCES GAME_RESULT(uuid) ON DELETE CASCADE
+                open_card BOOLEAN NOT NULL,
+                deck_pile INTEGER NOT NULL,
+                round_number INTEGER NOT NULL,
+                winner_r1 NUMERIC(2,1) NOT NULL,
+                winner_r2 NUMERIC(2,1) NOT NULL,
+                winner_r3 NUMERIC(2,1) NOT NULL,
+                hand_winner BOOLEAN NOT NULL,
+                choice TEXT NOT NULL,
+                CONSTRAINT played_card_uuid_pk PRIMARY KEY (uuid)
             );
             """;
+    }
+
+    private String createIncreasePointsTable() {
+        return """
+        CREATE TABLE IF NOT EXISTS INCREASE_POINTS (
+            uuid UUID NOT NULL,
+            game_uuid UUID NOT NULL,
+            weak_card INTEGER NOT NULL,
+            medium_card INTEGER NOT NULL,
+            strong_card INTEGER NOT NULL,
+            player_type TEXT NOT NULL,
+            open_hand BOOLEAN NOT NULL,
+            pile INTEGER[] NOT NULL,
+            winner_r1 NUMERIC(2,1) NOT NULL,
+            winner_r2 NUMERIC(2,1) NOT NULL,
+            winner_r3 NUMERIC(2,1) NOT NULL,
+            player_points INTEGER NOT NULL,
+            opponent_points INTEGER NOT NULL,
+            hand_value INTEGER NOT NULL,
+            opponent_accepted INTEGER NOT NULL,
+            general_score_impact INTEGER NOT NULL,
+            CONSTRAINT increase_points_pk PRIMARY KEY (uuid)
+        );
+        """;
     }
 
 //    private String createTournamentTable() {
