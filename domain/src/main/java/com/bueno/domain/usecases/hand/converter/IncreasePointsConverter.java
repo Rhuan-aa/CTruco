@@ -9,39 +9,50 @@ import com.bueno.domain.entities.hand.Round;
 import com.bueno.domain.entities.player.Player;
 import com.bueno.domain.usecases.hand.dtos.IncreasePointsDto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class IncreasePointsConverter {
 
-    public static List<IncreasePointsDto> ofGame(Game game) {
-        return game.getHands().stream()
-                .map(IncreasePointsConverter::ofHand)
-                .collect(Collectors.toList());
-    }
+    public static List<IncreasePointsDto> ofHand(Hand hand, Game game) {
+        List<IncreasePointsDto> roundDtos = new ArrayList<>();
+        List<Round> rounds = hand.getRoundsPlayed();
 
-    private static IncreasePointsDto ofHand(Hand hand) {
         Player p1 = hand.getFirstToPlay();
         Player p2 = hand.getLastToPlay();
-
-        List<Card> p1DealtCards = hand.getDealtCards().stream()
-                .filter(c -> !c.equals(hand.getVira()))
-                .sorted((c1, c2) -> c1.compareValueTo(c2, hand.getVira()))
-                .collect(Collectors.toList());
-
-        List<Card> playedCards = hand.getOpenCards();
-        List<Round> rounds = hand.getRoundsPlayed();
         Card vira = hand.getVira();
 
-        String r1 = !rounds.isEmpty() ? getRoundWinnerName(rounds.get(0)) : "NONE";
-        String r2 = rounds.size() > 1 ? getRoundWinnerName(rounds.get(1)) : "NONE";
-        String r3 = rounds.size() > 2 ? getRoundWinnerName(rounds.get(2)) : "NONE";
+        List<Card> p1DealtCards = hand.getDealtCards().stream()
+                .filter(c -> !c.equals(vira))
+                .sorted((c1, c2) -> c1.compareValueTo(c2, vira))
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < rounds.size(); i++) {
+            roundDtos.add(createDtoForRound(hand, game, p1, p2, vira, p1DealtCards, rounds, i));
+        }
+
+        return roundDtos;
+    }
+
+    private static IncreasePointsDto createDtoForRound(Hand hand, Game game, Player p1, Player p2, Card vira,
+                                                       List<Card> p1DealtCards, List<Round> rounds, int currentRoundIndex) {
+
+        List<Card> cardsPlayedUntilNow = new ArrayList<>();
+        for (int j = 0; j <= currentRoundIndex; j++) {
+            cardsPlayedUntilNow.add(rounds.get(j).getFirstCard());
+            cardsPlayedUntilNow.add(rounds.get(j).getLastCard());
+        }
+
+        double r1 = getRoundWinnerValue(rounds.get(0), game);
+        double r2 = (currentRoundIndex >= 1) ? getRoundWinnerValue(rounds.get(1), game) : -1.0;
+        double r3 = (currentRoundIndex >= 2) ? getRoundWinnerValue(rounds.get(2), game) : -1.0;
 
         return new IncreasePointsDto(
                 hand.getGameId(),
-                checkIfPlayed(p1DealtCards, playedCards, 0, vira),
-                checkIfPlayed(p1DealtCards, playedCards, 1, vira),
-                checkIfPlayed(p1DealtCards, playedCards, 2, vira),
+                checkIfPlayed(p1DealtCards, cardsPlayedUntilNow, 0, vira),
+                checkIfPlayed(p1DealtCards, cardsPlayedUntilNow, 1, vira),
+                checkIfPlayed(p1DealtCards, cardsPlayedUntilNow, 2, vira),
                 p1.getClass().getSimpleName(),
                 hand.isMaoDeOnze(),
                 getPile(hand, vira),
@@ -70,8 +81,10 @@ public class IncreasePointsConverter {
         return played.contains(card) ? -1 : card.getRelativeValue(vira);
     }
 
-    private static String getRoundWinnerName(Round round) {
-        return round.getWinner().map(Player::getUsername).orElse("DRAW");
+    private static double getRoundWinnerValue(Round round, Game game) {
+        return round.getWinner()
+                .map(winner -> winner.equals(game.getPlayer1()) ? 1.0 : 2.0)
+                .orElse(0.0);
     }
 
     private static int determineOpponentAcceptance(Hand hand) {

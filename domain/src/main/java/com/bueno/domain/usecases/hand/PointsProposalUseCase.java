@@ -32,6 +32,7 @@ import com.bueno.domain.usecases.game.converter.GameConverter;
 import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.hand.repos.HandResultRepository;
+import com.bueno.domain.usecases.hand.repos.IncreasePointsRepository;
 import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
 import com.bueno.domain.usecases.hand.validator.ActionValidator;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
@@ -54,11 +55,12 @@ public class PointsProposalUseCase {
     private final BotUseCase botUseCase;
     private final BotManagerService botManagerService;
     private final MaoDeOnzeRepository maoDeOnzeRepository;
+    private final IncreasePointsRepository increasePointsRepository;
 
     public PointsProposalUseCase(GameRepository gameRepository,
                                  RemoteBotRepository remoteBotRepository,
-                                 RemoteBotApi remoteBotApi, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository) {
-        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, botManagerService, maoDeOnzeRepository);
+                                 RemoteBotApi remoteBotApi, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasePointsRepository increasePointsRepository) {
+        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, botManagerService, maoDeOnzeRepository, increasePointsRepository);
     }
 
     @Autowired
@@ -66,12 +68,13 @@ public class PointsProposalUseCase {
                                  RemoteBotRepository remoteBotRepository,
                                  RemoteBotApi remoteBotApi,
                                  GameResultRepository gameResultRepository,
-                                 HandResultRepository handResultRepository, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository) {
+                                 HandResultRepository handResultRepository, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasePointsRepository increasePointsRepository) {
         this.gameRepository = Objects.requireNonNull(gameRepository);
         this.gameResultRepository = gameResultRepository;
         this.handResultRepository = handResultRepository;
         this.botManagerService = botManagerService;
         this.maoDeOnzeRepository = maoDeOnzeRepository;
+        this.increasePointsRepository = increasePointsRepository;
         this.botUseCase = new BotUseCase(gameRepository, remoteBotRepository, remoteBotApi, gameResultRepository, handResultRepository, botManagerService);
     }
 
@@ -114,7 +117,7 @@ public class PointsProposalUseCase {
 
         hand.quit(player);
 
-        final ResultHandler resultHandler = new ResultHandler(handResultRepository, maoDeOnzeRepository);
+        final ResultHandler resultHandler = new ResultHandler(handResultRepository, maoDeOnzeRepository, increasePointsRepository);
         final IntelDto gameResult = resultHandler.handle(game);
 
         gameRepository.update(GameConverter.toDto(game));
