@@ -1,7 +1,7 @@
 package com.bueno.persistence.repositories;
 
-import com.bueno.domain.usecases.hand.dtos.IncreasePointsDto;
-import com.bueno.domain.usecases.hand.repos.IncreasePointsRepository;
+import com.bueno.domain.usecases.hand.dtos.IncreasedPointsDto;
+import com.bueno.domain.usecases.hand.repos.IncreasedPointsRepository;
 import com.bueno.persistence.ConnectionFactory;
 import org.springframework.stereotype.Repository;
 
@@ -10,17 +10,29 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 @Repository
-public class IncreasePointsRepoImpl implements IncreasePointsRepository {
+public class IncreasedPointsRepoImpl implements IncreasedPointsRepository {
     @Override
-    public void save(IncreasePointsDto dto) {
+    public void save(IncreasedPointsDto dto) {
         String sql = """
-            INSERT INTO increase_points (
-                uuid, game_uuid, weak_card, medium_card, strong_card, 
-                player_type, open_hand, pile, winner_r1, winner_r2, 
-                winner_r3, player_points, opponent_points, hand_value, 
-                opponent_accepted, general_score_impact
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            INSERT INTO increased_points (
+                    uuid,
+                    game_uuid,
+                    weak_card,
+                    medium_card,
+                    strong_card,
+                    player_type,
+                    open_hand,
+                    pile,
+                    winner_r1,
+                    winner_r2,
+                    winner_r3,
+                    player_points,
+                    opponent_points,
+                    hand_value,
+                    opponent_accepted,
+                    general_score_impact
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """;
         try (PreparedStatement preparedStatement = ConnectionFactory.createPreparedStatement(sql)) {
             var connection = preparedStatement.getConnection();
@@ -44,7 +56,6 @@ public class IncreasePointsRepoImpl implements IncreasePointsRepository {
             preparedStatement.setInt(16, dto.generalScoreImpact());
 
             preparedStatement.executeUpdate();
-
         } catch (SQLException e) {
             System.err.println(e.getClass() + ": " + e.getMessage() + "| IncreasePoints couldn't be saved");
             e.printStackTrace();

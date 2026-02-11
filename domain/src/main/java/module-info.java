@@ -4,6 +4,7 @@ module domain {
     requires bot.spi;
     requires spring.context;
     requires spring.beans;
+    requires org.jetbrains.annotations;
 
     exports com.bueno.domain.usecases.game.usecase;
     exports com.bueno.domain.usecases.game.dtos;
