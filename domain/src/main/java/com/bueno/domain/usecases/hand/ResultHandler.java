@@ -21,12 +21,13 @@
 package com.bueno.domain.usecases.hand;
 
 import com.bueno.domain.entities.game.Game;
+import com.bueno.domain.entities.hand.Hand;
 import com.bueno.domain.usecases.hand.converter.HandResultConverter;
-import com.bueno.domain.usecases.hand.converter.IncreasePointsConverter;
+import com.bueno.domain.usecases.hand.converter.IncreasedPointsConverter;
 import com.bueno.domain.usecases.hand.converter.MaoDeOnzeConverter;
 import com.bueno.domain.usecases.hand.converter.PlayedCardConverter;
 import com.bueno.domain.usecases.hand.repos.HandResultRepository;
-import com.bueno.domain.usecases.hand.repos.IncreasePointsRepository;
+import com.bueno.domain.usecases.hand.repos.IncreasedPointsRepository;
 import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
 import com.bueno.domain.usecases.hand.repos.PlayedCardRepository;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
@@ -36,10 +37,10 @@ class ResultHandler {
 
     private final HandResultRepository handResultRepository;
     private final MaoDeOnzeRepository maoDeOnzeRepository;
-    private final IncreasePointsRepository increasePointsRepository;
+    private final IncreasedPointsRepository increasePointsRepository;
     private final PlayedCardRepository playedCardRepository;
 
-    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, IncreasePointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
+    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
         this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.handResultRepository = handResultRepository;
         this.increasePointsRepository = increasePointsRepository;
@@ -47,18 +48,18 @@ class ResultHandler {
     }
 
     IntelDto handle(Game game) {
-        game.currentHand().getResult().ifPresent(unused -> {
+        Hand hand = game.currentHand();
+        hand.getResult().ifPresent(unused -> {
             if (handResultRepository != null) {
                 handResultRepository.save(HandResultConverter.of(game));
 
-                if (game.currentHand().isMaoDeOnze()) {
-                    final var dto = MaoDeOnzeConverter.of(game);
-                    maoDeOnzeRepository.save(dto);
+                if (shouldSaveMaoDeOnze(hand)) {
+                    maoDeOnzeRepository.save(MaoDeOnzeConverter.of(game));
                 }
             }
 
-            if (increasePointsRepository != null) {
-                IncreasePointsConverter.of(game).forEach(increasePointsRepository::save);
+            if (increasePointsRepository != null && shouldSaveIncreasedPoints(hand)) {
+                IncreasedPointsConverter.of(game).forEach(increasePointsRepository::save);
             }
 
             if (playedCardRepository != null) {
@@ -72,6 +73,18 @@ class ResultHandler {
             return IntelConverter.toDto(game.getIntel());
         }
         return null;
+    }
+
+    private boolean shouldSaveIncreasedPoints(Hand hand) {
+        return hand.getLastBetRaiser() != null;
+    }
+
+    private boolean shouldSaveMaoDeOnze(Hand hand) {
+        return hand.isMaoDeOnze() &&
+                hand.getLastIntel()
+                        .event()
+                        .map(e -> !e.equals("QUIT_HAND"))
+                        .orElse(false);
     }
 
     private void updateGameStatus(Game game) {
