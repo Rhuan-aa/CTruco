@@ -34,8 +34,9 @@ import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.hand.dtos.PlayCardDto;
 import com.bueno.domain.usecases.hand.repos.HandResultRepository;
-import com.bueno.domain.usecases.hand.repos.IncreasePointsRepository;
+import com.bueno.domain.usecases.hand.repos.IncreasedPointsRepository;
 import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
+import com.bueno.domain.usecases.hand.repos.PlayedCardRepository;
 import com.bueno.domain.usecases.hand.validator.ActionValidator;
 import com.bueno.domain.usecases.intel.converters.CardConverter;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
@@ -54,12 +55,13 @@ public class PlayCardUseCase {
     private final RemoteBotRepository remoteBotRepository;
     private final RemoteBotApi remoteBotApi;
     private final BotManagerService botManagerService;
-    private final IncreasePointsRepository increasePointsRepository;
+    private final IncreasedPointsRepository increasePointsRepository;
+    private final PlayedCardRepository playedCardRepository;
 
     public PlayCardUseCase(GameRepository gameRepository,
                            RemoteBotRepository remoteBotRepository,
-                           RemoteBotApi remoteBotApi, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasePointsRepository increasePointsRepository) {
-        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, maoDeOnzeRepository, botManagerService, increasePointsRepository);
+                           RemoteBotApi remoteBotApi, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
+        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, maoDeOnzeRepository, botManagerService, increasePointsRepository, playedCardRepository);
     }
 
     @Autowired
@@ -67,7 +69,7 @@ public class PlayCardUseCase {
                            RemoteBotRepository remoteBotRepository,
                            RemoteBotApi remoteBotApi,
                            GameResultRepository gameResultRepository,
-                           HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, BotManagerService botManagerService, IncreasePointsRepository increasePointsRepository) {
+                           HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, BotManagerService botManagerService, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
 
         this.gameRepository = gameRepository;
         this.gameResultRepository = gameResultRepository;
@@ -77,6 +79,7 @@ public class PlayCardUseCase {
         this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.botManagerService = botManagerService;
         this.increasePointsRepository = increasePointsRepository;
+        this.playedCardRepository = playedCardRepository;
         this.botUseCase = new BotUseCase(gameRepository, remoteBotRepository, remoteBotApi, gameResultRepository, handResultRepository, botManagerService);
     }
 
@@ -103,7 +106,7 @@ public class PlayCardUseCase {
         if (hand.getCardToPlayAgainst().isEmpty()) hand.playFirstCard(player, playedCard);
         else hand.playSecondCard(player, playedCard);
 
-        final ResultHandler resultHandler = new ResultHandler(handResultRepository, maoDeOnzeRepository, increasePointsRepository);
+        final ResultHandler resultHandler = new ResultHandler(handResultRepository, maoDeOnzeRepository, increasePointsRepository, playedCardRepository);
         final IntelDto gameResult = resultHandler.handle(game);
 
         gameRepository.update(GameConverter.toDto(game));
