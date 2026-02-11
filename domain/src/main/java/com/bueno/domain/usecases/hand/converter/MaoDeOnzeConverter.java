@@ -6,21 +6,20 @@ import com.bueno.domain.entities.hand.Hand;
 import com.bueno.domain.entities.hand.HandResult;
 import com.bueno.domain.entities.player.Player;
 import com.bueno.domain.usecases.hand.dtos.MaoDeOnzeDto;
-
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class MaoDeOnzeConverter {
 
     public static MaoDeOnzeDto of(Game game) {
         Hand hand = game.currentHand();
-        Player playerOnze = hand.getFirstToPlay().getScore() == 11 ? hand.getFirstToPlay() : hand.getLastToPlay();
-        Player oponente = playerOnze.equals(game.getPlayer1()) ? game.getPlayer2() : game.getPlayer1();
+        Card vira = hand.getVira();
+        Player p1 = hand.getFirstToPlay();
+        Player p2 = hand.getLastToPlay();
+        Player playerOnze = p1.getScore() == 11 ? p1 : p2;
+        Player oponente = playerOnze.equals(p1) ? p2 : p1;
+
         Player vencedorDaMao = hand.getResult().flatMap(HandResult::getWinner).orElse(null);
-        Card vira = game.getIntel().vira();
-        List<Card> cards = new ArrayList<>(playerOnze.getCards());
-        cards.sort(Comparator.comparingInt(c -> c.getRelativeValue(vira)));
+        List<Card> cards = getReconstructedHand(playerOnze, hand, vira);
 
         return new MaoDeOnzeDto(
                 game.getUuid(),
@@ -30,8 +29,12 @@ public class MaoDeOnzeConverter {
                 playerOnze.getClass().getSimpleName(),
                 playerOnze.getScore(),
                 oponente.getScore(),
-                game.getFirstToPlay().equals(playerOnze),
+                hand.isMaoDeOnze(),
                 playerOnze.equals(vencedorDaMao)
         );
+    }
+
+    private static List<Card> getReconstructedHand(Player player, Hand hand, Card vira) {
+        return IncreasedPointsConverter.getPlayedCards(player, hand, vira);
     }
 }
