@@ -35,5 +35,11 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../bot-impl/libs/mineiro-by-bueno-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

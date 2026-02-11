@@ -3,7 +3,7 @@ package com.bueno.domain.usecases.hand.dtos;
 import java.util.List;
 import java.util.UUID;
 
-public record IncreasePointsDto(
+public record IncreasedPointsDto(
         UUID gameUuid,
         int weakCardValue,
         int mediumCardValue,
