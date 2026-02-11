@@ -19,7 +19,7 @@ public class DataBaseBuilder {
             statement.addBatch(createInviteTable());
             statement.addBatch(createMaoDeOnzeTable());
             statement.addBatch(createPlayedCardTable());
-            statement.addBatch(createIncreasePointsTable());
+            statement.addBatch(createIncreasedPointsTable());
 //            statement.addBatch(createTournamentTable());
 //            statement.addBatch(createTournamentParticipantsTable());
 //            statement.addBatch(createTournamentMatchesTable());
@@ -35,15 +35,16 @@ public class DataBaseBuilder {
 
     private void dropDatabases() throws SQLException {
         try (Statement statement = ConnectionFactory.createStatement()) {
-            statement.addBatch("DROP TABLE IF EXISTS increase_points");
-            statement.addBatch("DROP TABLE IF EXISTS mao_de_onze");
-            statement.addBatch("DROP TABLE IF EXISTS played_card");
-            statement.addBatch("DROP TABLE IF EXISTS hand_result");
-            statement.addBatch("DROP TABLE IF EXISTS game_result");
-            statement.addBatch("DROP TABLE IF EXISTS remote_bot");
-            statement.addBatch("DROP TABLE IF EXISTS session");
-            statement.addBatch("DROP TABLE IF EXISTS invite");
-            statement.addBatch("DROP TABLE IF EXISTS app_user");
+            statement.addBatch("DROP TABLE IF EXISTS increase_points CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS increased_points CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS mao_de_onze CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS played_card CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS hand_result CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS game_result CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS remote_bot CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS session CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS invite CASCADE");
+            statement.addBatch("DROP TABLE IF EXISTS app_user CASCADE");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament_participant");
 //            statement.addBatch("DROP TABLE IF EXISTS tournament_match");
@@ -207,9 +208,9 @@ public class DataBaseBuilder {
             """;
     }
 
-    private String createIncreasePointsTable() {
+    private String createIncreasedPointsTable() {
         return """
-        CREATE TABLE IF NOT EXISTS INCREASE_POINTS (
+        CREATE TABLE IF NOT EXISTS INCREASED_POINTS (
             uuid UUID NOT NULL,
             game_uuid UUID NOT NULL,
             weak_card INTEGER NOT NULL,
@@ -226,7 +227,7 @@ public class DataBaseBuilder {
             hand_value INTEGER NOT NULL,
             opponent_accepted INTEGER NOT NULL,
             general_score_impact INTEGER NOT NULL,
-            CONSTRAINT increase_points_pk PRIMARY KEY (uuid)
+            CONSTRAINT increased_points_pk PRIMARY KEY (uuid)
         );
         """;
     }
