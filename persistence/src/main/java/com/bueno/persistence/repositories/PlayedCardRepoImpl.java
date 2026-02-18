@@ -21,16 +21,17 @@ public class PlayedCardRepoImpl implements PlayedCardRepository{
                     medium_card,
                     strong_card,
                     player_type,
-                    open_card,
+                    open_hand,
                     deck_pile,
                     round_number,
                     winner_r1,
                     winner_r2,
                     winner_r3,
-                    hand_winner,
-                    choice
+                    choice,
+                    choice_is_closed,
+                    hand_winner
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                 """;
         try (PreparedStatement preparedStatement = ConnectionFactory.createPreparedStatement(sql)) {
             preparedStatement.setObject(1, UUID.randomUUID());
@@ -39,14 +40,15 @@ public class PlayedCardRepoImpl implements PlayedCardRepository{
             preparedStatement.setInt(4, dto.mediumCardValue());
             preparedStatement.setInt(5, dto.strongCardValue());
             preparedStatement.setString(6, dto.playerType());
-            preparedStatement.setBoolean(7, dto.openCard());
+            preparedStatement.setBoolean(7, dto.openHand());
             preparedStatement.setInt(8, dto.deckPile());
             preparedStatement.setInt(9, dto.roundNumber());
             preparedStatement.setDouble(10, dto.winnerR1());
             preparedStatement.setDouble(11, dto.winnerR2());
             preparedStatement.setDouble(12, dto.winnerR3());
-            preparedStatement.setBoolean(13, dto.handWinner());
-            preparedStatement.setString(14, dto.choice());
+            preparedStatement.setInt(13, dto.choice());
+            preparedStatement.setInt(14, dto.choiceIsClosed() ? 1 : 0);
+            preparedStatement.setBoolean(15, dto.handWinner());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.err.println(e.getClass() + ": " + e.getMessage() + "| PlayedCard couldn't be saved");
