@@ -37,13 +37,11 @@ class ResultHandler {
 
     private final HandResultRepository handResultRepository;
     private final MaoDeOnzeRepository maoDeOnzeRepository;
-    private final IncreasedPointsRepository increasePointsRepository;
     private final PlayedCardRepository playedCardRepository;
 
-    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
+    ResultHandler(HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, PlayedCardRepository playedCardRepository) {
         this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.handResultRepository = handResultRepository;
-        this.increasePointsRepository = increasePointsRepository;
         this.playedCardRepository = playedCardRepository;
     }
 
@@ -56,10 +54,6 @@ class ResultHandler {
                 if (shouldSaveMaoDeOnze(hand)) {
                     maoDeOnzeRepository.save(MaoDeOnzeConverter.of(game));
                 }
-            }
-
-            if (increasePointsRepository != null && shouldSaveIncreasedPoints(hand)) {
-                IncreasedPointsConverter.of(game).forEach(increasePointsRepository::save);
             }
 
             if (playedCardRepository != null) {
@@ -75,9 +69,6 @@ class ResultHandler {
         return null;
     }
 
-    private boolean shouldSaveIncreasedPoints(Hand hand) {
-        return hand.getLastBetRaiser() != null;
-    }
 
     private boolean shouldSaveMaoDeOnze(Hand hand) {
         return hand.isMaoDeOnze() &&
