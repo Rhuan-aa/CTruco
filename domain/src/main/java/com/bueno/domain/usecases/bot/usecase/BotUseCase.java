@@ -52,31 +52,32 @@ public class BotUseCase {
     private final RemoteBotRepository remoteBotRepo;
     private final RemoteBotApi remoteBotApi;
     private final BotManagerService botManagerService;
+
+    private final MaoDeOnzeRepository maoDeOnzeRepository;
+    private final IncreasedPointsRepository increasePointsRepository;
+    private final PlayedCardRepository playedCardRepository;
+
     private MaoDeOnzeHandler maoDeOnzeHandler;
     private RaiseHandler raiseHandler;
     private CardPlayingHandler cardHandler;
     private RaiseRequestHandler requestHandler;
     private BotServiceProvider bot1;
     private BotServiceProvider bot2;
-    private MaoDeOnzeRepository maoDeOnzeRepository;
-    private IncreasedPointsRepository increasePointsRepository;
-    private PlayedCardRepository playedCardRepository;
 
     public BotUseCase(GameRepository gameRepo, RemoteBotRepository remoteBotRepo, RemoteBotApi remoteBotApi, BotManagerService botManagerService, String bot1Name, String bot2Name) {
-        this(gameRepo, remoteBotRepo, remoteBotApi, null, null, botManagerService, null, null, null, null);
+        this(gameRepo, remoteBotRepo, remoteBotApi, null, null, botManagerService);
         bot1 = botManagerService.load(bot1Name);
         bot2 = botManagerService.load(bot2Name);
     }
 
     public BotUseCase(GameRepository gameRepo, RemoteBotRepository remoteBotRepo, RemoteBotApi remoteBotApi,
                       GameResultRepository gameResultRepo, HandResultRepository handResultRepo, BotManagerService botManagerService) {
-        this(gameRepo, remoteBotRepo, remoteBotApi, gameResultRepo, handResultRepo, botManagerService, null, null, null, null);
+        this(gameRepo, remoteBotRepo, remoteBotApi, gameResultRepo, handResultRepo, botManagerService, null, null, null);
     }
 
     public BotUseCase(GameRepository gameRepo, RemoteBotRepository remoteBotRepo, RemoteBotApi remoteBotApi,
                       GameResultRepository gameResultRepo, HandResultRepository handResultRepo, BotManagerService botManagerService,
-                      MaoDeOnzeHandler maoDeOnze, RaiseHandler raise, CardPlayingHandler card,
-                      RaiseRequestHandler request) {
+                      MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
 
         this.gameRepo = Objects.requireNonNull(gameRepo);
         this.gameResultRepo = gameResultRepo;
@@ -84,10 +85,9 @@ public class BotUseCase {
         this.remoteBotApi = remoteBotApi;
         this.handResultRepo = handResultRepo;
         this.botManagerService = botManagerService;
-        this.maoDeOnzeHandler = maoDeOnze;
-        this.raiseHandler = raise;
-        this.cardHandler = card;
-        this.requestHandler = request;
+        this.maoDeOnzeRepository = maoDeOnzeRepository;
+        this.increasePointsRepository = increasePointsRepository;
+        this.playedCardRepository = playedCardRepository;
     }
 
     public Intel playWhenNecessary(Game game, BotManagerService botManagerService) {

@@ -1,21 +1,21 @@
 /*
- *  Copyright (C) 2022 Lucas B. R. de Oliveira - IFSP/SCL
- *  Contact: lucas <dot> oliveira <at> ifsp <dot> edu <dot> br
+ * Copyright (C) 2022 Lucas B. R. de Oliveira - IFSP/SCL
+ * Contact: lucas <dot> oliveira <at> ifsp <dot> edu <dot> br
  *
- *  This file is part of CTruco (Truco game for didactic purpose).
+ * This file is part of CTruco (Truco game for didactic purpose).
  *
- *  CTruco is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * CTruco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  CTruco is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * CTruco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with CTruco.  If not, see <https://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License
+ * along with CTruco.  If not, see <https://www.gnu.org/licenses/>
  */
 
 package com.bueno.domain.usecases.hand;
@@ -31,6 +31,7 @@ import com.bueno.domain.usecases.bot.usecase.BotUseCase;
 import com.bueno.domain.usecases.game.converter.GameConverter;
 import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
+import com.bueno.domain.usecases.hand.converter.IncreasedPointsConverter;
 import com.bueno.domain.usecases.hand.repos.HandResultRepository;
 import com.bueno.domain.usecases.hand.repos.IncreasedPointsRepository;
 import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
@@ -78,7 +79,17 @@ public class PointsProposalUseCase {
         this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.increasePointsRepository = increasePointsRepository;
         this.playedCardRepository = playedCardRepository;
-        this.botUseCase = new BotUseCase(gameRepository, remoteBotRepository, remoteBotApi, gameResultRepository, handResultRepository, botManagerService);
+        this.botUseCase = new BotUseCase(
+                gameRepository,
+                remoteBotRepository,
+                remoteBotApi,
+                gameResultRepository,
+                handResultRepository,
+                botManagerService,
+                maoDeOnzeRepository,
+                increasePointsRepository,
+                playedCardRepository
+        );
     }
 
     public IntelDto raise(UUID playerUuid) {
@@ -93,6 +104,7 @@ public class PointsProposalUseCase {
         botUseCase.playWhenNecessary(game, botManagerService);
 
         game = gameRepository.findByPlayerUuid(playerUuid).map(GameConverter::fromDto).orElseThrow();
+        if (increasePointsRepository != null) IncreasedPointsConverter.of(game).forEach(increasePointsRepository::save);
         return IntelConverter.toDto(game.getIntel());
     }
 
@@ -108,6 +120,7 @@ public class PointsProposalUseCase {
         botUseCase.playWhenNecessary(game, botManagerService);
 
         game = gameRepository.findByPlayerUuid(playerUuid).map(GameConverter::fromDto).orElseThrow();
+        if (increasePointsRepository != null) IncreasedPointsConverter.of(game).forEach(increasePointsRepository::save);
         return IntelConverter.toDto(game.getIntel());
     }
 
@@ -120,7 +133,7 @@ public class PointsProposalUseCase {
 
         hand.quit(player);
 
-        final ResultHandler resultHandler = new ResultHandler(handResultRepository, maoDeOnzeRepository, increasePointsRepository, playedCardRepository);
+        final ResultHandler resultHandler = new ResultHandler(handResultRepository, maoDeOnzeRepository, playedCardRepository);
         final IntelDto gameResult = resultHandler.handle(game);
 
         gameRepository.update(GameConverter.toDto(game));
