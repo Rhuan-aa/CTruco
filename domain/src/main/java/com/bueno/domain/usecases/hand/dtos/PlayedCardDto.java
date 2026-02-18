@@ -8,13 +8,14 @@ public record PlayedCardDto(
         int mediumCardValue,
         int strongCardValue,
         String playerType,
-        boolean openCard,
+        boolean openHand,
         int deckPile,
         int roundNumber,
         double winnerR1,
         double winnerR2,
         double winnerR3,
         boolean handWinner,
-        String choice
+        int choice,
+        boolean choiceIsClosed
 ) {
 }
