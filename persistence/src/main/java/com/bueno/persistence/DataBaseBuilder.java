@@ -195,14 +195,15 @@ public class DataBaseBuilder {
                 medium_card INTEGER NOT NULL,
                 strong_card INTEGER NOT NULL,
                 player_type TEXT NOT NULL,
-                open_card BOOLEAN NOT NULL,
+                open_hand BOOLEAN NOT NULL,
                 deck_pile INTEGER NOT NULL,
                 round_number INTEGER NOT NULL,
                 winner_r1 NUMERIC(2,1) NOT NULL,
                 winner_r2 NUMERIC(2,1) NOT NULL,
                 winner_r3 NUMERIC(2,1) NOT NULL,
+                choice INTEGER NOT NULL,
+                choice_is_closed INTEGER NOT NULL,
                 hand_winner BOOLEAN NOT NULL,
-                choice TEXT NOT NULL,
                 CONSTRAINT played_card_uuid_pk PRIMARY KEY (uuid)
             );
             """;
