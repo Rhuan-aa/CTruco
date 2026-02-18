@@ -7,6 +7,7 @@ import com.bueno.domain.entities.hand.HandResult;
 import com.bueno.domain.entities.player.Player;
 import com.bueno.domain.usecases.hand.dtos.MaoDeOnzeDto;
 import java.util.List;
+import static com.bueno.domain.usecases.hand.converter.IncreasedPointsConverter.getPlayedCards;
 
 public class MaoDeOnzeConverter {
 
@@ -35,6 +36,6 @@ public class MaoDeOnzeConverter {
     }
 
     private static List<Card> getReconstructedHand(Player player, Hand hand, Card vira) {
-        return IncreasedPointsConverter.getPlayedCards(player, hand, vira);
+        return getPlayedCards(player, hand, vira);
     }
 }
