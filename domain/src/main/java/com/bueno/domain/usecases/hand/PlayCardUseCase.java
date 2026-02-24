@@ -59,16 +59,15 @@ public class PlayCardUseCase {
 
     public PlayCardUseCase(GameRepository gameRepository,
                            RemoteBotRepository remoteBotRepository,
-                           RemoteBotApi remoteBotApi, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
-        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, maoDeOnzeRepository, botManagerService, increasePointsRepository, playedCardRepository);
-    }
+                           RemoteBotApi remoteBotApi, BotManagerService botManagerService) {
+        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, botManagerService, null, null, null);    }
 
     @Autowired
     public PlayCardUseCase(GameRepository gameRepository,
                            RemoteBotRepository remoteBotRepository,
                            RemoteBotApi remoteBotApi,
                            GameResultRepository gameResultRepository,
-                           HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, BotManagerService botManagerService, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
+                           HandResultRepository handResultRepository, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
 
         this.gameRepository = gameRepository;
         this.handResultRepository = handResultRepository;

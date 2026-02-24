@@ -62,8 +62,8 @@ public class PointsProposalUseCase {
 
     public PointsProposalUseCase(GameRepository gameRepository,
                                  RemoteBotRepository remoteBotRepository,
-                                 RemoteBotApi remoteBotApi, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
-        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, botManagerService, maoDeOnzeRepository, increasePointsRepository, playedCardRepository);
+                                 RemoteBotApi remoteBotApi, BotManagerService botManagerService) {
+        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, botManagerService, null, null, null);
     }
 
     @Autowired
