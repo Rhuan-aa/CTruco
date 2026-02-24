@@ -146,7 +146,7 @@ public class BotUseCase {
                     botService);
         if (cardHandler == null)
             cardHandler = new CardPlayingHandler(
-                    new PlayCardUseCase(gameRepo, remoteBotRepo, remoteBotApi, gameResultRepo, handResultRepo, maoDeOnzeRepository, botManagerService, increasePointsRepository, playedCardRepository),
+                    new PlayCardUseCase(gameRepo, remoteBotRepo, remoteBotApi, gameResultRepo, handResultRepo, botManagerService, maoDeOnzeRepository, increasePointsRepository, playedCardRepository),
                     botService);
         if (requestHandler == null)
             requestHandler = new RaiseRequestHandler(
