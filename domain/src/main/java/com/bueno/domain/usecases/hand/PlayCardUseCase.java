@@ -45,12 +45,9 @@ import com.bueno.domain.usecases.utils.exceptions.UnsupportedGameRequestExceptio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class PlayCardUseCase {
     private final GameRepository gameRepository;
-    private final GameResultRepository gameResultRepository;
     private final HandResultRepository handResultRepository;
     private final MaoDeOnzeRepository maoDeOnzeRepository;
     private final BotUseCase botUseCase;
@@ -74,7 +71,6 @@ public class PlayCardUseCase {
                            HandResultRepository handResultRepository, MaoDeOnzeRepository maoDeOnzeRepository, BotManagerService botManagerService, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
 
         this.gameRepository = gameRepository;
-        this.gameResultRepository = gameResultRepository;
         this.handResultRepository = handResultRepository;
         this.remoteBotRepository = remoteBotRepository;
         this.remoteBotApi = remoteBotApi;
@@ -127,7 +123,6 @@ public class PlayCardUseCase {
         botUseCase.playWhenNecessary(game, botManagerService);
 
         game = gameRepository.findByPlayerUuid(request.uuid()).map(GameConverter::fromDto).orElseThrow();
-        //        if (game.isDone()) gameRepository.delete(game.getUuid());
         return IntelConverter.toDto(game.getIntel());
     }
 }
