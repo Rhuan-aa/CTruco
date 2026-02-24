@@ -32,7 +32,6 @@ import com.bueno.domain.usecases.intel.HandleIntelUseCase;
 import com.bueno.domain.usecases.intel.dtos.CardDto;
 import com.bueno.domain.usecases.intel.dtos.IntelDto;
 import com.bueno.persistence.repositories.RemoteBotRepositoryImpl;
-import com.bueno.persistence.repositories.UserRepositoryImpl;
 import com.remote.RemoteBotApiAdapter;
 
 import java.util.*;
@@ -50,13 +49,6 @@ public class PlayAgainstBots {
     private final List<IntelDto> missingIntel;
     private IntelDto lastIntel;
     private UUID userUUID;
-
-//    public static void main(String[] args) {
-//        LogManager.getLogManager().reset();
-//        final var cli = new PlayAgainstBots();
-//        cli.createGame();
-//        cli.play();
-//    }
 
     public void gameCLIStarter() {
         createGame();
