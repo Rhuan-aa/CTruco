@@ -1,26 +1,24 @@
-# ESTÁGIO 1: Compilação (Build)
-FROM maven:3.8.4-openjdk-17-slim AS build
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-COPY pom.xml .
+COPY pom.xml ./
+COPY domain/pom.xml domain/pom.xml
+COPY console/pom.xml console/pom.xml
+COPY desktop/pom.xml desktop/pom.xml
+COPY persistence/pom.xml persistence/pom.xml
+COPY bot-spi/pom.xml bot-spi/pom.xml
+COPY bot-impl/pom.xml bot-impl/pom.xml
+COPY web/pom.xml web/pom.xml
 
-# Copia todos os módulos para satisfazer a estrutura do Maven
-COPY domain ./domain
-COPY persistence ./persistence
-COPY bot-spi ./bot-spi
-COPY bot-impl ./bot-impl
-COPY web ./web
-COPY console ./console
-COPY desktop ./desktop
+RUN mvn -B -q -DskipTests dependency:go-offline
 
-# AJUSTE AQUI: Adicionamos -Dmaven.test.skip=true
-# Isso pula a compilação e a execução dos testes, ignorando o erro no BotUseCaseTest
-RUN mvn clean package -Dmaven.test.skip=true -pl web -am
+COPY . .
+RUN mvn -B -DskipTests clean package -pl web -am
 
-# ESTÁGIO 2: Execução (Runtime)
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
-COPY --from=build /app/web/target/web-1.2.0-SNAPSHOT.jar app.jar
+COPY --from=build /app/web/target/web-*.jar app.jar
 
-ENTRYPOINT ["java", "-Xmx512m", "-Dserver.port=${PORT}", "-jar", "app.jar"]
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
