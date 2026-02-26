@@ -26,9 +26,8 @@ public class WebSocketGameController {
 
     @MessageMapping("/games/{gameUuid}/quit")
     public void quitGame(@DestinationVariable UUID gameUuid, UUID playerUuid) {
-        if (gameRepository.findByPlayerUuid(playerUuid).isPresent()) {
+        if (gameRepository.findByPlayerUuid(playerUuid).isPresent())
             removeGameUseCase.byUserUuid(playerUuid, true);
-        }
         simpMessagingTemplate.convertAndSend("/topic/game/" + gameUuid + "/quit", gameUuid);
     }
 }
