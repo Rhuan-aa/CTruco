@@ -172,7 +172,8 @@ class BotUseCaseTest {
                 remoteBotRepository,
                 remoteBotApi,
                 gameResultRepository,
-                handResultRepository,new BotManagerService(remoteBotRepository,remoteBotApi) , null, null, null, null
+                handResultRepository,
+                new BotManagerService(remoteBotRepository,remoteBotApi)
         );
         when(game.getIntel().currentPlayerUuid()).thenReturn(Optional.empty());
         assertThatNoException().isThrownBy(() -> sut.playWhenNecessary(game,new BotManagerService(remoteBotRepository,remoteBotApi)));
