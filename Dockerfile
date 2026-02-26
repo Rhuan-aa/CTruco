@@ -8,6 +8,7 @@ COPY desktop/pom.xml desktop/pom.xml
 COPY persistence/pom.xml persistence/pom.xml
 COPY bot-spi/pom.xml bot-spi/pom.xml
 COPY bot-impl/pom.xml bot-impl/pom.xml
+COPY bot-impl/libs/mineiro-by-bueno-1.0-SNAPSHOT.jar bot-impl/libs/mineiro-by-bueno-1.0-SNAPSHOT.jar
 COPY web/pom.xml web/pom.xml
 
 RUN mvn -B -q -DskipTests dependency:go-offline
