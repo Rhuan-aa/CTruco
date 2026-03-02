@@ -60,26 +60,6 @@ public class PlayedCardRepoImpl implements PlayedCardRepository {
     }
 
     @Override
-    public List<PlayedCardDto> findByGameUuid(UUID gameUuid) {
-        String sql = "SELECT * FROM played_card WHERE game_uuid = ?";
-        List<PlayedCardDto> results = new ArrayList<>();
-
-        try (PreparedStatement statement = ConnectionFactory.createPreparedStatement(sql)) {
-            statement.setObject(1, gameUuid);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    results.add(mapResultSetToDto(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getClass() + ": " + e.getMessage() + "| Could not find PlayedCards by Game UUID");
-            e.printStackTrace();
-        }
-        return results;
-    }
-
-    @Override
     public List<PlayedCardDto> findAll() {
         String sql = "SELECT * FROM played_card";
         List<PlayedCardDto> results = new ArrayList<>();
@@ -103,7 +83,7 @@ public class PlayedCardRepoImpl implements PlayedCardRepository {
                 rs.getInt("weak_card"),
                 rs.getInt("medium_card"),
                 rs.getInt("strong_card"),
-                rs.getString("player_type"),
+                rs.getString("playerType"),
                 rs.getBoolean("open_hand"),
                 rs.getInt("deck_pile"),
                 rs.getInt("round_number"),

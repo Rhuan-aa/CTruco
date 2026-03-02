@@ -7,9 +7,9 @@ public record MaoDeOnzeDto (
         int weakCardValue,
         int mediumCardValue,
         int strongCardValue,
-        String player_type,
-        int player_points,
-        int opponents_points,
+        String playerType,
+        int playerPoints,
+        int opponentsPoints,
         boolean openHand,
         boolean handWinner
 ) { }

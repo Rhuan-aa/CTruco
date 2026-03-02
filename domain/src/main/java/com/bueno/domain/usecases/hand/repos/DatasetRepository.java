@@ -5,6 +5,5 @@ import java.util.UUID;
 
 public interface DatasetRepository <T> {
     void save(T data);
-    List<T> findByGameUuid(UUID gameUuid);
     List<T> findAll();
 }
