@@ -65,26 +65,6 @@ public class IncreasedPointsRepoImpl implements IncreasedPointsRepository {
     }
 
     @Override
-    public List<IncreasedPointsDto> findByGameUuid(UUID gameUuid) {
-        String sql = "SELECT * FROM increased_points WHERE game_uuid = ?";
-        List<IncreasedPointsDto> results = new ArrayList<>();
-
-        try (PreparedStatement statement = ConnectionFactory.createPreparedStatement(sql)) {
-            statement.setObject(1, gameUuid);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    results.add(mapResultSetToDto(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getClass() + ": " + e.getMessage() + "| Could not find IncreasedPoints by Game UUID");
-            e.printStackTrace();
-        }
-        return results;
-    }
-
-    @Override
     public List<IncreasedPointsDto> findAll() {
         String sql = "SELECT * FROM increased_points";
         List<IncreasedPointsDto> results = new ArrayList<>();

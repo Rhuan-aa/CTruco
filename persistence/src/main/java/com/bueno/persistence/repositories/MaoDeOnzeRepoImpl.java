@@ -37,9 +37,9 @@ public class MaoDeOnzeRepoImpl implements MaoDeOnzeRepository {
             preparedStatement.setInt(3, dto.weakCardValue());
             preparedStatement.setInt(4, dto.mediumCardValue());
             preparedStatement.setInt(5, dto.strongCardValue());
-            preparedStatement.setString(6, dto.player_type());
-            preparedStatement.setInt(7, dto.player_points());
-            preparedStatement.setInt(8, dto.opponents_points());
+            preparedStatement.setString(6, dto.playerType());
+            preparedStatement.setInt(7, dto.playerPoints());
+            preparedStatement.setInt(8, dto.opponentsPoints());
             preparedStatement.setBoolean(9, dto.openHand());
             preparedStatement.setBoolean(10, dto.handWinner());
             preparedStatement.executeUpdate();
@@ -48,26 +48,6 @@ public class MaoDeOnzeRepoImpl implements MaoDeOnzeRepository {
             System.err.println(e.getClass() + ": " + e.getMessage() + "| MaoDeOnze couldn't be saved");
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public List<MaoDeOnzeDto> findByGameUuid(UUID gameUuid) {
-        String sql = "SELECT * FROM mao_de_onze WHERE game_uuid = ?";
-        List<MaoDeOnzeDto> results = new ArrayList<>();
-
-        try (PreparedStatement statement = ConnectionFactory.createPreparedStatement(sql)) {
-            statement.setObject(1, gameUuid);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    results.add(mapResultSetToDto(resultSet));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getClass() + ": " + e.getMessage() + "| Could not find MaoDeOnze by Game UUID");
-            e.printStackTrace();
-        }
-        return results;
     }
 
     @Override
@@ -94,8 +74,8 @@ public class MaoDeOnzeRepoImpl implements MaoDeOnzeRepository {
                 rs.getInt("weak_card"),
                 rs.getInt("medium_card"),
                 rs.getInt("strong_card"),
-                rs.getString("player_type"),
-                rs.getInt("player_points"),
+                rs.getString("playerType"),
+                rs.getInt("playerPoints"),
                 rs.getInt("opponent_points"),
                 rs.getBoolean("open_hand"),
                 rs.getBoolean("hand_winner")
