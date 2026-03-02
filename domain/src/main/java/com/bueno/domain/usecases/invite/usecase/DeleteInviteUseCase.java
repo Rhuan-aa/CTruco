@@ -17,11 +17,6 @@ public class DeleteInviteUseCase {
         this.inviteRepo = inviteRepo;
     }
 
-    public void deleteInviteByInvited(UUID invitedPlayerUuid) {
-        Objects.requireNonNull(invitedPlayerUuid, "Host's uuid can't be null");
-        inviteRepo.deleteByPlayerUuid(invitedPlayerUuid);
-    }
-
     public void deleteInviteByUuid(UUID inviteUuid) {
         Objects.requireNonNull(inviteUuid, "Invite's uuid can't be null");
         inviteRepo.deleteByInviteUuid(inviteUuid);
