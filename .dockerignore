@@ -1,0 +1,9 @@
+**/target/
+Dockerfile
+.dockerignore
+docker-compose.yaml
+.idea/
+.vscode/
+*.iml
+.git/
+.gitignore
