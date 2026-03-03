@@ -1,24 +1,29 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
-COPY pom.xml ./
-COPY domain/pom.xml domain/pom.xml
-COPY console/pom.xml console/pom.xml
-COPY desktop/pom.xml desktop/pom.xml
-COPY persistence/pom.xml persistence/pom.xml
-COPY bot-spi/pom.xml bot-spi/pom.xml
-COPY bot-impl/pom.xml bot-impl/pom.xml
-COPY web/pom.xml web/pom.xml
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
 
-RUN mvn -B -q -DskipTests dependency:go-offline
+COPY web/pom.xml web/
+COPY persistence/pom.xml persistence/
+COPY domain/pom.xml domain/
+COPY bot-spi/pom.xml bot-spi/
+COPY bot-impl/pom.xml bot-impl/
+COPY bot-impl/libs bot-impl/libs
+COPY console/pom.xml console/
+COPY desktop/pom.xml desktop/
+
+RUN chmod +x mvnw && sed -i 's/\r$//' mvnw
+
+RUN ./mvnw install:install-file -Dfile=bot-impl/libs/mineiro-by-bueno-1.0-SNAPSHOT.jar -DgroupId=com.bueno -DartifactId=mineiro-by-bueno -Dversion=1.0-SNAPSHOT -Dpackaging=jar
+
+RUN ./mvnw dependency:go-offline
 
 COPY . .
-RUN mvn -B -DskipTests clean package -pl web -am
 
-FROM eclipse-temurin:17-jre
-WORKDIR /app
+RUN chmod +x mvnw && sed -i 's/\r$//' mvnw
 
-COPY --from=build /app/web/target/web-*.jar app.jar
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "web/target/web-1.2.0-SNAPSHOT.jar"]
