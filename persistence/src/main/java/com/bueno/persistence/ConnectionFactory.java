@@ -18,8 +18,12 @@ public class ConnectionFactory implements AutoCloseable {
     }
 
     private static void instantiateConnectionIfNull() throws SQLException {
-        if (connection == null)
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ctruco", "postgres", "password");
+        if (connection == null) {
+            String url = getDatasourceRef("url", "jdbc:postgresql://localhost:5432/ctruco");
+            String user = getDatasourceRef("username", "postgres");
+            String password = getDatasourceRef("password", "password");
+            connection = DriverManager.getConnection(url, user, password);
+        }
     }
 
     public static PreparedStatement createPreparedStatement(String sql) {
@@ -52,8 +56,13 @@ public class ConnectionFactory implements AutoCloseable {
     }
 
     private static void closeConnectionIfNotNull() throws SQLException {
-
         if (connection != null) connection.close();
+    }
+
+    private static String getDatasourceRef(String ref, String defaultRef) {
+        return System.getenv("SPRING_DATASOURCE_" + ref.toUpperCase()) != null
+                ? System.getenv("SPRING_DATASOURCE_" + ref.toUpperCase())
+                : defaultRef;
     }
 }
 
