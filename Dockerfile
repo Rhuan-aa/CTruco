@@ -24,6 +24,6 @@ COPY . .
 
 RUN chmod +x mvnw && sed -i 's/\r$//' mvnw
 
-RUN ./mvnw clean package -Dmaven.test.skip=true
+RUN ./mvnw clean install -Dmaven.test.skip=true
 
 CMD ["java", "-jar", "web/target/web-1.2.0-SNAPSHOT.jar"]
