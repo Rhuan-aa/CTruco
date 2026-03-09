@@ -21,7 +21,7 @@ public class ConnectionFactory implements AutoCloseable {
         if (connection == null) {
             String url = getDatasourceRef(
                     "url",
-                    "jdbc:postgresql://ctruco:***REMOVED***@dpg-d6n2g6ftskes73e6ov2g-a/c_truco_database_2jnm"
+                    "jdbc:postgresql://dpg-d6n2g6ftskes73e6ov2g-a.oregon-postgres.render.com/c_truco_database_2jnm"
             );
             String user = getDatasourceRef("username", "ctruco");
             String password = getDatasourceRef("password", "***REMOVED***");
