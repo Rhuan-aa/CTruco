@@ -74,7 +74,7 @@ public class MaoDeOnzeRepoImpl implements MaoDeOnzeRepository {
                 rs.getInt("weak_card"),
                 rs.getInt("medium_card"),
                 rs.getInt("strong_card"),
-                rs.getString("playerType"),
+                rs.getString("player_type"),
                 rs.getInt("playerPoints"),
                 rs.getInt("opponent_points"),
                 rs.getBoolean("open_hand"),
