@@ -63,33 +63,33 @@ public class WebApp {
     ) {
         return args -> {
             TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
-            tournamentRepository.deleteAll();
-            matchRepository.deleteAll();
-            final String encodedPassword = encoder.encode("123123");
-            final RegisterUserRequestDto defaultUser = new RegisterUserRequestDto("Lucas", encodedPassword, "lucas.ruas@gmail.com");
-            final RegisterUserRequestDto user1 = new RegisterUserRequestDto("User 1", encodedPassword, "user1@gmail.com");
-            final RegisterUserRequestDto user2 = new RegisterUserRequestDto("User 2", encodedPassword, "user2@gmail.com");
-            final RegisterUserRequestDto rhuan = new RegisterUserRequestDto("Rhuan", encodedPassword, "rh@gmail.c");
-            final RegisterUserRequestDto rh = new RegisterUserRequestDto("rhuan1", encodedPassword, "rh@gmail.c.br");
-            final UUID defaultUuid = registerUserUseCase.create(defaultUser).uuid();
-            final UUID user1Uuid = registerUserUseCase.create(user1).uuid();
-            final UUID user2Uuid = registerUserUseCase.create(user2).uuid();
-            final TransientRemoteBotDto remoteBot = new TransientRemoteBotDto(UUID.randomUUID(), defaultUuid, "Remote Bot", "http://localhost", "8030", "https://github.com/gcontiero11/CTruco");
-            botRepository.save(remoteBot);
-            botRepository.authorizeByUuid(remoteBot.uuid());
-            for (int i = 0; i < 30; i++) {
-                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-                        LocalDateTime.now(), defaultUuid, defaultUuid, 12, user1Uuid, 3));
-                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-                        LocalDateTime.now(), user1Uuid, user2Uuid, 7, user1Uuid, 12));
-                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-                        LocalDateTime.now(), defaultUuid, user2Uuid, 5, defaultUuid, 12));
-            }
-            gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-                    LocalDateTime.now(), user2Uuid, user2Uuid, 7, user1Uuid, 12));
-
-            final UUID rhuanUuid = registerUserUseCase.create(rhuan).uuid();
-            final UUID rhUuid = registerUserUseCase.create(rh).uuid();
+//            tournamentRepository.deleteAll();
+//            matchRepository.deleteAll();
+//            final String encodedPassword = encoder.encode("123123");
+//            final RegisterUserRequestDto defaultUser = new RegisterUserRequestDto("Lucas", encodedPassword, "lucas.ruas@gmail.com");
+//            final RegisterUserRequestDto user1 = new RegisterUserRequestDto("User 1", encodedPassword, "user1@gmail.com");
+//            final RegisterUserRequestDto user2 = new RegisterUserRequestDto("User 2", encodedPassword, "user2@gmail.com");
+//            final RegisterUserRequestDto rhuan = new RegisterUserRequestDto("Rhuan", encodedPassword, "rh@gmail.c");
+//            final RegisterUserRequestDto rh = new RegisterUserRequestDto("rhuan1", encodedPassword, "rh@gmail.c.br");
+//            final UUID defaultUuid = registerUserUseCase.create(defaultUser).uuid();
+//            final UUID user1Uuid = registerUserUseCase.create(user1).uuid();
+//            final UUID user2Uuid = registerUserUseCase.create(user2).uuid();
+//            final TransientRemoteBotDto remoteBot = new TransientRemoteBotDto(UUID.randomUUID(), defaultUuid, "Remote Bot", "http://localhost", "8030", "https://github.com/gcontiero11/CTruco");
+//            botRepository.save(remoteBot);
+//            botRepository.authorizeByUuid(remoteBot.uuid());
+//            for (int i = 0; i < 30; i++) {
+//                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
+//                        LocalDateTime.now(), defaultUuid, defaultUuid, 12, user1Uuid, 3));
+//                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
+//                        LocalDateTime.now(), user1Uuid, user2Uuid, 7, user1Uuid, 12));
+//                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
+//                        LocalDateTime.now(), defaultUuid, user2Uuid, 5, defaultUuid, 12));
+//            }
+//            gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
+//                    LocalDateTime.now(), user2Uuid, user2Uuid, 7, user1Uuid, 12));
+//
+//            final UUID rhuanUuid = registerUserUseCase.create(rhuan).uuid();
+//            final UUID rhUuid = registerUserUseCase.create(rh).uuid();
             rankBotsOnTime.updateRankTable();
         };
     }
