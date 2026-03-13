@@ -40,6 +40,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -61,6 +62,7 @@ public class WebApp {
                           RankBotsOnTime rankBotsOnTime
     ) {
         return args -> {
+            TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
             tournamentRepository.deleteAll();
             matchRepository.deleteAll();
             final String encodedPassword = encoder.encode("123123");
