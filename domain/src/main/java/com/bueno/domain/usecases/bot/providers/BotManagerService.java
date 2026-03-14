@@ -43,12 +43,13 @@ public class BotManagerService {
 
         List<BotServiceProvider> bots = new ArrayList<>(spiProviders.toList());
 
-        // if (lastCheck == null || Duration.between(lastCheck, Instant.now()).toMinutes() > HEALTH_CHECK_PERIOD) {}
-        remoteBotsCache.addAll(repository.findAll().stream()
-                .filter(this::isHealth)
-                .map(this::toBotServiceProvider)
-                .toList());
-        lastCheck = Instant.now();
+        if (lastCheck == null || Duration.between(lastCheck, Instant.now()).toMinutes() > HEALTH_CHECK_PERIOD) {
+            remoteBotsCache.addAll(repository.findAll().stream()
+                    .filter(this::isHealth)
+                    .map(this::toBotServiceProvider)
+                    .toList());
+            lastCheck = Instant.now();
+        }
 
         bots.addAll(remoteBotsCache);
 
