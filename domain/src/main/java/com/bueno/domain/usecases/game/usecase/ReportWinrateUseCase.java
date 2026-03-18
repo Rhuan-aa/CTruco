@@ -30,8 +30,12 @@ public class ReportWinrateUseCase {
                         PlayerWinrateStatsDto::merge
                 ))
                 .values().stream()
+                .sorted(
+                        Comparator.comparing(PlayerWinrateStatsDto::isQualified).reversed()
+                                .thenComparingDouble(PlayerWinrateStatsDto::getBayesianScore).reversed()
+                                .thenComparingInt(PlayerWinrateStatsDto::totalGames).reversed()
+                )
                 .map(PlayerWinrateDto::new)
-                .sorted(Comparator.comparingDouble(PlayerWinrateDto::winrate).reversed())
                 .toList();
     }
 }

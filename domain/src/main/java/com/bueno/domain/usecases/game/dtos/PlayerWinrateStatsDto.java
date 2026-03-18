@@ -5,7 +5,7 @@ public record PlayerWinrateStatsDto(
         int wins,
         int totalGames) {
     private static final double BASELINE_WINRATE = 0.5;
-    private static final double CONFIDENCE_WEIGHT = 10.0;
+    private static final double CONFIDENCE_WEIGHT = 15.0;
 
     public static PlayerWinrateStatsDto fromGame(String playerName, String winnerName) {
         boolean isWinner = playerName.equals(winnerName);
@@ -22,5 +22,9 @@ public record PlayerWinrateStatsDto(
 
     public double getBayesianScore() {
         return (wins + (CONFIDENCE_WEIGHT * BASELINE_WINRATE)) / (totalGames + CONFIDENCE_WEIGHT);
+    }
+
+    public boolean isQualified() {
+        return totalGames >= 15;
     }
 }
