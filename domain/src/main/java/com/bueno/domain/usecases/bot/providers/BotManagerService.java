@@ -19,8 +19,8 @@ public class BotManagerService {
 
     private final RemoteBotRepository repository;
     private final RemoteBotApi api;
-    private final List<BotServiceProvider> remoteBotsCache = new ArrayList<>();
-    private Instant lastCheck;
+    private volatile List<BotServiceProvider> remoteBotsCache = Collections.emptyList();
+    private volatile Instant lastCheck;
 
     public BotManagerService(RemoteBotRepository repository, RemoteBotApi api) {
         this.repository = repository;
@@ -28,9 +28,11 @@ public class BotManagerService {
     }
 
     public BotServiceProvider load(String botServiceName) {
-        final Predicate<BotServiceProvider> hasName = botImpl -> botImpl.getName().equals(botServiceName);
-        final Optional<BotServiceProvider> possibleBot = providers().filter(hasName).findAny();
-        return possibleBot.orElseThrow(() -> new NoSuchElementException("Service implementation not available: " + botServiceName));
+        final Predicate<BotServiceProvider> hasName = botImpl ->
+                botImpl.getName().equals(botServiceName);
+        return providers().filter(hasName).findAny()
+                .orElseThrow(() ->
+                        new NoSuchElementException("Service implementation not available: " + botServiceName));
     }
 
     public List<String> providersNames() {
@@ -43,17 +45,30 @@ public class BotManagerService {
 
         List<BotServiceProvider> bots = new ArrayList<>(spiProviders.toList());
 
-        if (lastCheck == null || Duration.between(lastCheck, Instant.now()).toMinutes() > HEALTH_CHECK_PERIOD) {
-            remoteBotsCache.addAll(repository.findAll().stream()
-                    .filter(this::isHealth)
-                    .map(this::toBotServiceProvider)
-                    .toList());
-            lastCheck = Instant.now();
-        }
+        refreshCacheIfExpired();
 
         bots.addAll(remoteBotsCache);
 
         return bots.stream();
+    }
+
+
+    private void refreshCacheIfExpired() {
+        if (isCacheExpired()) {
+            synchronized (this) {
+                if (isCacheExpired()) {
+                    this.remoteBotsCache = repository.findAll().stream()
+                            .filter(this::isHealth)
+                            .map(this::toBotServiceProvider)
+                            .toList();
+                    this.lastCheck = Instant.now();
+                }
+            }
+        }
+    }
+
+    private boolean isCacheExpired() {
+        return lastCheck == null || Duration.between(lastCheck, Instant.now()).toMinutes() > HEALTH_CHECK_PERIOD;
     }
 
     private boolean isHealth(RemoteBotDto dto) {
