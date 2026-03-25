@@ -90,7 +90,6 @@ public class WebApp {
 //
 //            final UUID rhuanUuid = registerUserUseCase.create(rhuan).uuid();
 //            final UUID rhUuid = registerUserUseCase.create(rh).uuid();
-            rankBotsOnTime.updateRankTable();
         };
     }
 }
