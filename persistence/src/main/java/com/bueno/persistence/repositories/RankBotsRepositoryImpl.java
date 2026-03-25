@@ -72,8 +72,9 @@ public class RankBotsRepositoryImpl implements RankBotsRepository {
         try {
             if (botRankInfoDtos.isEmpty()) throw new Exception("BotRankInfoDto is empty");
 
-            if (botRankInfoDtos.size() < findAll().size())
-                throw new Exception("BotRankInfoDto size is smaller than before, this is just a security feature");
+//            if (botRankInfoDtos.size() < findAll().size()) {
+//                throw new Exception("BotRankInfoDto size is smaller than before, this is just a security feature");
+//            }
 
             deleteAll();
             saveAll(botRankInfoDtos);
