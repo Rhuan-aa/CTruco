@@ -97,7 +97,6 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-        // add this line to use H2 web console
         http.headers().frameOptions().disable();
     }
 
