@@ -15,7 +15,7 @@ public class RankBotsOnTime {
         this.rankBotsRepository = rankBotsRepository;
     }
 
-    @Scheduled(initialDelay = 15000, fixedRate = 1200000)
+    @Scheduled(initialDelay = 30000, fixedRate = 1200000)
     public void updateRankTable() {
         rankBotsUseCase.rankAll();
         rankBotsRepository.refreshTable(rankBotsUseCase.getRank());
