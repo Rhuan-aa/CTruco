@@ -10,7 +10,6 @@ import java.util.UUID;
 public class Session {
     private final UUID uuid;
     private final UUID playerUuid;
-    private String accessToken;
     private Instant expiresAt;
 
     private Session(UUID uuid, UUID playerId, Instant expiresAt) {
@@ -38,10 +37,6 @@ public class Session {
                 playerUuid,
                 expiresAt
         );
-    }
-
-    public boolean isTokenValid() {
-        return Instant.now().isBefore(this.expiresAt);
     }
 
     public void reloadExpiration() {
