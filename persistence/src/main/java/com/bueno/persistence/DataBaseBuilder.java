@@ -7,7 +7,6 @@ public class DataBaseBuilder {
 
     public void buildDataBaseIfMissing() throws SQLException {
         System.out.println("Building tables if they don't exists: \n");
-        dropDatabases();
 
         try (Statement statement = ConnectionFactory.createStatement()) {
             statement.addBatch(createAppUserTable());
