@@ -40,6 +40,7 @@ import java.util.Map;
 
 import static java.lang.System.currentTimeMillis;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import org.springframework.http.ResponseCookie;
 
 @Component
 public class JwtTokenHelper {
@@ -70,7 +71,7 @@ public class JwtTokenHelper {
         return new Date(currentTimeMillis() + jwtProperties.getTokenExpirationAfterMinutes() * MILLIS_OF_MINUTES);
     }
 
-    public Cookie createRefreshTokenCookie(ApplicationUser user, String issuer) {
+    public ResponseCookie createRefreshTokenCookie(ApplicationUser user, String issuer) {
         final String token = Jwts.builder()
                 .setSubject(user.getUuid().toString())
                 .setIssuedAt(new Date())
@@ -78,11 +79,14 @@ public class JwtTokenHelper {
                 .setExpiration(getRefreshTokenExpiration())
                 .signWith(secretKey)
                 .compact();
-        Cookie cookie = new Cookie(jwtProperties.getRefreshTokenProperty(), token);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(getCookieExpiration());
-        cookie.setPath("/");
-        return cookie;
+
+        return ResponseCookie.from(jwtProperties.getRefreshTokenProperty(), token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("None")
+                .maxAge(getCookieExpiration())
+                .build();
     }
 
     private java.sql.Date getRefreshTokenExpiration() {
