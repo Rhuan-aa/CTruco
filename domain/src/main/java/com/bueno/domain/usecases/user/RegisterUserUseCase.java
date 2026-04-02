@@ -33,9 +33,11 @@ import java.util.UUID;
 public class RegisterUserUseCase {
 
     private final UserRepository repo;
+    private final EmailValidator validator;
 
-    public RegisterUserUseCase(UserRepository repo) {
+    public RegisterUserUseCase(UserRepository repo, EmailValidator emailValidatorUseCase) {
         this.repo = Objects.requireNonNull(repo, "User repository must not be null.");
+        this.validator = emailValidatorUseCase;
     }
 
     public RegisterUserResponseDto create(RegisterUserRequestDto request){
@@ -48,6 +50,11 @@ public class RegisterUserUseCase {
 
         if(repo.findByEmail(request.email()).isPresent())
             inputError += "This email is already in use: " + request.email();
+
+        String emailValidationError = validator.validate(request.email());
+        if (emailValidationError != null) {
+            inputError += emailValidationError + "\n";
+        }
 
         if(!inputError.isEmpty())
             throw new EntityAlreadyExistsException(inputError);

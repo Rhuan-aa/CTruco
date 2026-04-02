@@ -7,6 +7,7 @@ module domain {
     requires org.jetbrains.annotations;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
+    requires java.naming;
 
     exports com.bueno.domain.usecases.game.usecase;
     exports com.bueno.domain.usecases.game.dtos;
