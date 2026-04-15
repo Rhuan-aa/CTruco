@@ -14,6 +14,5 @@ public interface SessionRepository {
     Optional<SessionDto> findByPlayerUuid(UUID playerUuid);
 
     Collection<InvitablePlayerDto> findInvitableSessions(UUID playerUuid);
-    Collection<SessionDto> findAllSessions();
     Collection<SessionDto> findAllExpired();
 }

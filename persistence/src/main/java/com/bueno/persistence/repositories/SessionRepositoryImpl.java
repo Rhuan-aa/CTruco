@@ -115,17 +115,6 @@ public class SessionRepositoryImpl implements SessionRepository {
     }
 
     @Override
-    public Collection<SessionDto> findAllSessions() {
-        String sql = "SELECT * FROM session";
-
-        try (PreparedStatement preparedStatement = ConnectionFactory.createPreparedStatement(sql)) {
-            return getSessionDtos(preparedStatement);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public Collection<SessionDto> findAllExpired() {
         String sql = "SELECT * FROM session WHERE expires_at = ?";
 
