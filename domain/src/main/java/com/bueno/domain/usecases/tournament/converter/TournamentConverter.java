@@ -30,7 +30,6 @@ public class TournamentConverter {
                     matchList.stream().map(MatchDTO::uuid).toList(),
                     tournament.getSize(), tournament.getTimes(), tournament.getFinalAndThirdPlaceMatchTimes(), null);
         } else {
-            //TODO - trocar isso dps
             return null;
         }
     }
