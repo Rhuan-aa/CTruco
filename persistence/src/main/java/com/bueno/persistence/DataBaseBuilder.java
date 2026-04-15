@@ -6,7 +6,7 @@ import java.sql.Statement;
 public class DataBaseBuilder {
 
     public void buildDataBaseIfMissing() throws SQLException {
-        //dropDatabase() -- uncomment when you want to reset database
+        //dropDatabases(); // uncomment when you want to reset database
         System.out.println("Building tables if they don't exists: \n");
 
         try (Statement statement = ConnectionFactory.createStatement()) {

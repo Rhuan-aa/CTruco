@@ -29,6 +29,8 @@ import com.bueno.domain.usecases.game.usecase.RankBotsOnTime;
 import com.bueno.domain.usecases.tournament.repos.MatchRepository;
 import com.bueno.domain.usecases.tournament.repos.TournamentRepository;
 import com.bueno.domain.usecases.user.RegisterUserUseCase;
+import com.bueno.domain.usecases.user.UserRepository;
+import com.bueno.domain.usecases.user.dtos.ApplicationUserDto;
 import com.bueno.domain.usecases.user.dtos.RegisterUserRequestDto;
 import com.bueno.persistence.DataBaseBuilder;
 import org.springframework.boot.CommandLineRunner;
@@ -40,6 +42,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -59,37 +62,29 @@ public class WebApp {
                           RemoteBotRepository botRepository,
                           TournamentRepository tournamentRepository,
                           MatchRepository matchRepository,
-                          RankBotsOnTime rankBotsOnTime
+                          UserRepository userRepository
     ) {
         return args -> {
             TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
-//            tournamentRepository.deleteAll();
-//            matchRepository.deleteAll();
-//            final String encodedPassword = encoder.encode("123123");
-//            final RegisterUserRequestDto defaultUser = new RegisterUserRequestDto("Lucas", encodedPassword, "lucas.ruas@gmail.com");
-//            final RegisterUserRequestDto user1 = new RegisterUserRequestDto("User 1", encodedPassword, "user1@gmail.com");
-//            final RegisterUserRequestDto user2 = new RegisterUserRequestDto("User 2", encodedPassword, "user2@gmail.com");
-//            final RegisterUserRequestDto rhuan = new RegisterUserRequestDto("Rhuan", encodedPassword, "rh@gmail.c");
-//            final RegisterUserRequestDto rh = new RegisterUserRequestDto("rhuan1", encodedPassword, "rh@gmail.c.br");
-//            final UUID defaultUuid = registerUserUseCase.create(defaultUser).uuid();
-//            final UUID user1Uuid = registerUserUseCase.create(user1).uuid();
-//            final UUID user2Uuid = registerUserUseCase.create(user2).uuid();
-//            final TransientRemoteBotDto remoteBot = new TransientRemoteBotDto(UUID.randomUUID(), defaultUuid, "Remote Bot", "http://localhost", "8030", "https://github.com/gcontiero11/CTruco");
-//            botRepository.save(remoteBot);
-//            botRepository.authorizeByUuid(remoteBot.uuid());
-//            for (int i = 0; i < 30; i++) {
-//                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-//                        LocalDateTime.now(), defaultUuid, defaultUuid, 12, user1Uuid, 3));
-//                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-//                        LocalDateTime.now(), user1Uuid, user2Uuid, 7, user1Uuid, 12));
-//                gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-//                        LocalDateTime.now(), defaultUuid, user2Uuid, 5, defaultUuid, 12));
-//            }
-//            gameResultRepository.save(new GameResultDto(UUID.randomUUID(), LocalDateTime.now().minusMinutes(5),
-//                    LocalDateTime.now(), user2Uuid, user2Uuid, 7, user1Uuid, 12));
-//
-//            final UUID rhuanUuid = registerUserUseCase.create(rhuan).uuid();
-//            final UUID rhUuid = registerUserUseCase.create(rh).uuid();
+            if (botRepository.findAll().isEmpty()) {
+                tournamentRepository.deleteAll();
+                matchRepository.deleteAll();
+                UUID defaultUuid;
+                Optional<ApplicationUserDto> maybeUser = userRepository.findByEmail("lucas.ruas@gmail.com");
+
+                if (maybeUser.isEmpty()) {
+                    final String encodedPassword = encoder.encode("123123");
+                    final RegisterUserRequestDto defaultUser = new RegisterUserRequestDto("Lucas", encodedPassword, "lucas.ruas@gmail.com");
+
+                    defaultUuid = registerUserUseCase.create(defaultUser).uuid();
+                } else {
+                    defaultUuid = maybeUser.get().uuid();
+                }
+
+                final TransientRemoteBotDto remoteBot = new TransientRemoteBotDto(UUID.randomUUID(), defaultUuid, "Remote Bot", "http://localhost", "8030", "https://github.com/gcontiero11/CTruco");
+                botRepository.save(remoteBot);
+                botRepository.authorizeByUuid(remoteBot.uuid());
+            }
         };
     }
 }
