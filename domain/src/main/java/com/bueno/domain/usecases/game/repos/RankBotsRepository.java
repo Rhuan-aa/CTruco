@@ -15,9 +15,6 @@ public interface RankBotsRepository {
 
     void update(BotRankInfoDto botWinsOnRankDto);
 
-//    void updateAll(List<BotRankInfoDto> botWinsOnRankDto);
-
     boolean refreshTable(List<BotRankInfoDto> botRankInfoDtos);
 
-    boolean deleteByRank(BotRankInfoDto botInfo);
 }
