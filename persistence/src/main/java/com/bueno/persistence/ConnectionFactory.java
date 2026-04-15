@@ -19,12 +19,9 @@ public class ConnectionFactory implements AutoCloseable {
 
     private static void instantiateConnectionIfNull() throws SQLException {
         if (connection == null) {
-            String url = getDatasourceRef(
-                    "url",
-                    "jdbc:postgresql://dpg-d6n2g6ftskes73e6ov2g-a.oregon-postgres.render.com/c_truco_database_2jnm"
-            );
-            String user = getDatasourceRef("username", "ctruco");
-            String password = getDatasourceRef("password", "3790DHydVgPyBRYHa3dGsPFjPe5HoRdN");
+            String url = getDatasourceRef("url", "jdbc:postgresql://localhost:5432/ctruco");
+            String user = getDatasourceRef("username", "postgres");
+            String password = getDatasourceRef("password", "password");
             connection = DriverManager.getConnection(url, user, password);
         }
     }
