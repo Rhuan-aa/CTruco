@@ -6,6 +6,7 @@ import java.sql.Statement;
 public class DataBaseBuilder {
 
     public void buildDataBaseIfMissing() throws SQLException {
+        //dropDatabase() -- uncomment when you want to reset database
         System.out.println("Building tables if they don't exists: \n");
 
         try (Statement statement = ConnectionFactory.createStatement()) {
@@ -19,10 +20,6 @@ public class DataBaseBuilder {
             statement.addBatch(createMaoDeOnzeTable());
             statement.addBatch(createPlayedCardTable());
             statement.addBatch(createIncreasedPointsTable());
-//            statement.addBatch(createTournamentTable());
-//            statement.addBatch(createTournamentParticipantsTable());
-//            statement.addBatch(createTournamentMatchesTable());
-//            statement.addBatch(createTournamentMatchTable());
             statement.executeBatch();
 
             System.out.println("DATABASE CREATED");
@@ -44,11 +41,6 @@ public class DataBaseBuilder {
             statement.addBatch("DROP TABLE IF EXISTS session CASCADE");
             statement.addBatch("DROP TABLE IF EXISTS invite CASCADE");
             statement.addBatch("DROP TABLE IF EXISTS app_user CASCADE");
-//            statement.addBatch("DROP TABLE IF EXISTS tournament");
-//            statement.addBatch("DROP TABLE IF EXISTS tournament_participant");
-//            statement.addBatch("DROP TABLE IF EXISTS tournament_match");
-//            statement.addBatch("DROP TABLE IF EXISTS matches");
-//            statement.addBatch("DROP TABLE IF EXISTS bot_rank");
             statement.executeBatch();
         }
     }
@@ -231,52 +223,5 @@ public class DataBaseBuilder {
         );
         """;
     }
-
-//    private String createTournamentTable() {
-//        return """
-//                CREATE TABLE IF NOT EXISTS Tournament(
-//                    uuid UUID NOT NULL,
-//                    size INTEGER NOT NULL,
-//                    CONSTRAINT tournament_pk PRIMARY KEY (uuid)
-//                );
-//                """;
-//    }
-
-//    private String createTournamentParticipantsTable() {
-//        return """
-//                CREATE TABLE IF NOT EXISTS Tournament_participant(
-//                    participant_name VARCHAR(30) NOT NULL,
-//                    tournament_uuid UUID NOT NULL,
-//                    CONSTRAINT tournament_participants_pk PRIMARY KEY (participant_name, tournament_uuid)
-//                );
-//                """;
-//    }
-//
-//    private String createTournamentMatchesTable() {
-//        return """
-//                CREATE TABLE IF NOT EXISTS Tournament_match(
-//                    tournament_uuid UUID NOT NULL,
-//                    match_uuid UUID NOT NULL,
-//                    CONSTRAINT tournament_matches_pk PRIMARY KEY (tournament_uuid, match_uuid)
-//                );
-//                """;
-//    }
-//
-//    private String createTournamentMatchTable() {
-//        return """
-//                CREATE TABLE IF NOT EXISTS matches(
-//                    uuid UUID NOT NULL,
-//                    p1_name VARCHAR(30),
-//                    p2_name VARCHAR(30),
-//                    available BOOLEAN NOT NULL,
-//                    winner_name VARCHAR(30),
-//                    p1_score INTEGER NOT NULL,
-//                    p2_score INTEGER NOT NULL,
-//                    uuid_next UUID,
-//                    CONSTRAINT tournament_match_pk PRIMARY KEY (uuid)
-//                );
-//                """;
-//    }
-
 }
 
