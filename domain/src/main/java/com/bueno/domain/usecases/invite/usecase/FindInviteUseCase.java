@@ -19,16 +19,6 @@ public class FindInviteUseCase {
         this.inviteRepository = inviteRepository;
     }
 
-    public InviteDto findInviteByPlayerUuid(UUID playerUuid) {
-        Objects.requireNonNull(playerUuid, "Player's uuid can't be null");
-        Optional<InviteDto> inviteDto = inviteRepository.findByPlayerUuid(playerUuid);
-
-        if (inviteDto.isEmpty())
-            throw new IllegalArgumentException("This player doesn't have been invited or invited someone");
-
-        return inviteDto.get();
-    }
-
     public InviteDto findInviteByUuid(UUID inviteUuid) {
         Objects.requireNonNull(inviteUuid, "Invite's uuid can't be null");
         Optional<InviteDto> inviteDto = inviteRepository.findByUuid(inviteUuid);
