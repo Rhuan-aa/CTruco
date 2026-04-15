@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
-//TODO - fazer um criar rank utilizando @Scheduled 5hrs
 @Component
 public class RemoveInactiveTask {
 
@@ -41,8 +40,8 @@ public class RemoveInactiveTask {
         this.removeGameUseCase = removeGameUseCase;
     }
 
-    //@Scheduled(fixedRate = 30_000)
-    public void reportCurrentTime() {
+    @Scheduled(cron = "0 */5 * * * *")
+    public void removeInactiveGames() {
         final List<UUID> removedGames = removeGameUseCase.byInactivityAfter(5);
         removedGames.forEach(gameUuid -> log.info("Removed game {} due to inactivity.", gameUuid));
     }
