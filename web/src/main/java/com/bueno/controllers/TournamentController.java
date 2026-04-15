@@ -106,16 +106,6 @@ public class TournamentController {
                 .build();
     }
 
-//    @GetMapping("{tournamentUuid}/match/{chosenMatchNumber}")
-//    public ResponseEntity<?> getOneMatch(@PathVariable UUID tournamentUuid, @PathVariable int chosenMatchNumber) {
-//        MatchDTO matchDTO = matchRepository.findById(tournamentUuid).orElseThrow();
-//
-//        return new ResponseBuilder(HttpStatus.OK)
-//                .addEntry(new ResponseEntry("payload", matchDTO))
-//                .addTimestamp()
-//                .build();
-//    }
-
     @PostMapping("{tournamentUuid}/match/{chosenMatchNumber}/{numberOfSimulations}")
     public ResponseEntity<?> playMatch(@PathVariable UUID tournamentUuid, @PathVariable int chosenMatchNumber, @PathVariable int numberOfSimulations) {
         if (tournamentUuid == null) return new ResponseBuilder(HttpStatus.BAD_REQUEST)
