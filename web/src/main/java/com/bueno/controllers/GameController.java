@@ -97,10 +97,6 @@ public class GameController {
     }
 
     private static PlayWithBotsResponseDto getPlayWithBotsResponseDto(PlayWithBotsResultsDto results, SimulationRequestDto request) {
-
-        /* nessa stream é introduzido um List<PlayWithBotsDto> com os nomes de quem ganhou cada partida e é mapeado para um Map<String,Long>
-         em que a String é o nome do bot e o Long é a quantidade de vezes que ele ganhou.
-         TODO Tente achar um jeito melhor de fazer isso*/
         final Map<String, Long> filteredResults = results.info().stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
@@ -152,7 +148,6 @@ public class GameController {
 
     @DeleteMapping(path = "/players/{uuid}")
     public ResponseEntity<IntelDto> removeGame(@PathVariable UUID uuid) {
-        final boolean isFromInactivity = false;
         removeGameUseCase.byUserUuid(uuid,false);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

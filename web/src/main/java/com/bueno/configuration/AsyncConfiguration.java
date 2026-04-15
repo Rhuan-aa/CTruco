@@ -16,19 +16,12 @@ public class AsyncConfiguration {
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-
-        // Ajuste o número de threads principais e máximas conforme necessário
-        executor.setCorePoolSize(10);            // Número mínimo de threads
-        executor.setMaxPoolSize(20);             // Número máximo de threads
-        executor.setQueueCapacity(500);          // Capacidade da fila
-        executor.setKeepAliveSeconds(60);        // Tempo de vida das threads extras
-
-        // Configuração opcional para rastreamento
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(500);
+        executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix("Simulation-");
-
-        // RejectionPolicy: o que fazer se todas as threads e a fila estão cheias
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-
         executor.initialize();
         return executor;
     }
