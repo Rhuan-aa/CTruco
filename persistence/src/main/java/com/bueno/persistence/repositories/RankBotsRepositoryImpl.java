@@ -60,12 +60,6 @@ public class RankBotsRepositoryImpl implements RankBotsRepository {
         }
     }
 
-    //    @Override
-//    public void updateAll(List<BotRankInfoDto> botRankInfoDtos) throws Exception {
-//        if (botRankInfoDtos.size() != findAll().size()) throw new Exception("A quantidade de bots na lista é diferente " +
-//                                                                            "da quantidade de tuplas no banco");
-//        botRankInfoDtos.forEach(this::update);
-//    }
 
     @Override
     public boolean refreshTable(List<BotRankInfoDto> botRankInfoDtos) {
