@@ -43,9 +43,4 @@ public class DisposableActiveGameRepositoryImpl implements ActiveGameRepository 
     public Optional<Game> findByUuid(UUID key) {
         return Optional.ofNullable(game);
     }
-
-    @Override
-    public Optional<Game> findByUserUuid(UUID uuid) {
-        return Optional.ofNullable(game);
-    }
 }

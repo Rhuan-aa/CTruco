@@ -80,21 +80,6 @@ public class RankBotsRepositoryImpl implements RankBotsRepository {
         }
     }
 
-    @Override
-    public boolean deleteByRank(BotRankInfoDto botInfo) {
-        String sql = "DELETE * FROM bot_rank where rank = ?;";
-        try (PreparedStatement statement = ConnectionFactory.createPreparedStatement(sql)) {
-            statement.setLong(1, botInfo.botRank());
-            statement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.err.println(e.getClass() + ": " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-
-    }
-
     private boolean deleteAll() {
         try (Statement statement = ConnectionFactory.createStatement()) {
             statement.executeUpdate("DELETE FROM bot_rank");
