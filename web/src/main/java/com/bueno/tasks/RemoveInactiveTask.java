@@ -23,6 +23,8 @@ package com.bueno.tasks;
 import com.bueno.domain.usecases.game.usecase.RemoveGameUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +43,7 @@ public class RemoveInactiveTask {
     }
 
     @Scheduled(cron = "0 */5 * * * *")
+    @EventListener(ApplicationReadyEvent.class)
     public void removeInactiveGames() {
         final List<UUID> removedGames = removeGameUseCase.byInactivityAfter(5);
         removedGames.forEach(gameUuid -> log.info("Removed game {} due to inactivity.", gameUuid));
