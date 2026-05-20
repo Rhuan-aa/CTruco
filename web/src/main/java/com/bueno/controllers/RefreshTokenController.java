@@ -89,7 +89,7 @@ public class RefreshTokenController {
 
             response.addHeader(jwtProperties.getAuthorizationHeader(), jwtProperties.getTokenPrefix() + token);
 
-            final var session = refreshSessionUseCase.refreshSession(userId);
+            refreshSessionUseCase.refreshSession(userId);
             log.info("Refreshed session for: {}", userId);
 
             final Map<String, String> body = new HashMap<>();
