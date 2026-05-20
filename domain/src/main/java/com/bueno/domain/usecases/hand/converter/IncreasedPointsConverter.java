@@ -127,7 +127,6 @@ public class IncreasedPointsConverter {
                 .orElse(0.5);
     }
 
-    // --- MÉTODO CORRIGIDO ---
     private static List<Integer> getPile(Hand hand, Card vira) {
         List<Card> visibleCards = new ArrayList<>();
 
