@@ -20,11 +20,9 @@ public class RefreshSessionUseCase {
         this.sessionRepo = sessionRepo;
     }
 
-    public SessionDto refreshSession(UUID playerUuid) {
+    public void refreshSession(UUID playerUuid) {
         Objects.requireNonNull(playerUuid, "Request model cannot be null!");
-        SessionDto newDto = reloadExpiration(playerUuid);
-        sessionRepo.update(newDto);
-        return newDto;
+        sessionRepo.update(reloadExpiration(playerUuid));
     }
 
     private SessionDto reloadExpiration(UUID playerUuid) {

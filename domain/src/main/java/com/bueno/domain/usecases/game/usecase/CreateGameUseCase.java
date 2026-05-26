@@ -109,8 +109,6 @@ public class CreateGameUseCase {
     }
 
     private boolean hasNoBotServiceWith(String botName) {
-        List<String> availableBots = botManagerService.providersNames();
-        boolean hasService = availableBots.contains(botName);
         return !Objects.requireNonNull(botManagerService.providersNames()).contains(botName);
     }
 

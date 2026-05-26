@@ -60,12 +60,6 @@ public class RankBotsRepositoryImpl implements RankBotsRepository {
         }
     }
 
-    //    @Override
-//    public void updateAll(List<BotRankInfoDto> botRankInfoDtos) throws Exception {
-//        if (botRankInfoDtos.size() != findAll().size()) throw new Exception("A quantidade de bots na lista é diferente " +
-//                                                                            "da quantidade de tuplas no banco");
-//        botRankInfoDtos.forEach(this::update);
-//    }
 
     @Override
     public boolean refreshTable(List<BotRankInfoDto> botRankInfoDtos) {
@@ -84,21 +78,6 @@ public class RankBotsRepositoryImpl implements RankBotsRepository {
             e.printStackTrace();
             return false;
         }
-    }
-
-    @Override
-    public boolean deleteByRank(BotRankInfoDto botInfo) {
-        String sql = "DELETE * FROM bot_rank where rank = ?;";
-        try (PreparedStatement statement = ConnectionFactory.createPreparedStatement(sql)) {
-            statement.setLong(1, botInfo.botRank());
-            statement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.err.println(e.getClass() + ": " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-
     }
 
     private boolean deleteAll() {

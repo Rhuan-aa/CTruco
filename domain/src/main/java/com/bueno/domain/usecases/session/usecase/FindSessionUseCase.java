@@ -25,7 +25,7 @@ public class FindSessionUseCase {
         return sessionRepo
                 .findInvitableSessions(playerUuid)
                 .stream()
-                .filter(dto -> !gameRepo.findByPlayerUuid(dto.playerUuid()).isPresent())
+                .filter(dto -> gameRepo.findByPlayerUuid(dto.playerUuid()).isEmpty())
                 .toList();
     }
 

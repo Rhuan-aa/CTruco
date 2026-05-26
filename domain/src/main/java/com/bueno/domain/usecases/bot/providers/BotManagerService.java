@@ -50,6 +50,7 @@ public class BotManagerService {
                     .toList());
             lastCheck = Instant.now();
         }
+
         bots.addAll(remoteBotsCache);
 
         return bots.stream();
