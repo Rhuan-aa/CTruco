@@ -29,7 +29,6 @@ import com.bueno.domain.usecases.utils.exceptions.EntityNotFoundException;
 import com.bueno.persistence.dao.GameDao;
 import com.bueno.persistence.dao.PlayerDao;
 import com.bueno.persistence.dto.GameEntity;
-import com.bueno.persistence.dto.HandEntity;
 import com.bueno.persistence.dto.PlayerEntity;
 import org.springframework.stereotype.Repository;
 
@@ -93,32 +92,45 @@ public class GameRepositoryImpl implements GameRepository {
     }
 
     public boolean isInactive(GameEntity game, int minutes){
-        if(game.getHands().isEmpty()) return false;
-        final int index = game.getHands().size() - 1;
-        final HandEntity hand = game.getHands().get(index);
-        Map<UUID, PlayerDto> players = playersMap(game);
-        final HandDto handDto = game.getHands().get(index).toDto(game.getId(), players);
-        final IntelDto intel = handDto.history().get(handDto.history().size() - 1);
-        final Instant lastInteraction = intel.timestamp();
-        final Instant now = Instant.now();
-        final long inactivityInMinutes = Duration.between(lastInteraction, now).toMinutes();
-        System.out.println("Inactive during (minutes): " + inactivityInMinutes);
-        return inactivityInMinutes >= minutes;
+        try {
+            if(game.getHands() == null || game.getHands().isEmpty()) return false;
+            final int index = game.getHands().size() - 1;
+            Map<UUID, PlayerDto> players = playersMap(game);
+            if (players.isEmpty()) return false;
+            final HandDto handDto = game.getHands().get(index).toDto(game.getId(), players);
+            if (handDto.history() == null || handDto.history().isEmpty()) return false;
+            final IntelDto intel = handDto.history().get(handDto.history().size() - 1);
+            final Instant lastInteraction = intel.timestamp();
+            final Instant now = Instant.now();
+            final long inactivityInMinutes = Duration.between(lastInteraction, now).toMinutes();
+            return inactivityInMinutes >= minutes;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private Map<UUID, PlayerDto> playersMap(GameEntity game) {
-        PlayerDto p1 = playerDao.findById(game.getPlayer1()).orElseThrow().toDto();
-        PlayerDto p2 = playerDao.findById(game.getPlayer2()).orElseThrow().toDto();
-        Map<UUID,PlayerDto> players = new HashMap<>();
-        players.put(p1.uuid(),p1);
-        players.put(p2.uuid(),p2);
-        return players;
+        try {
+            Optional<PlayerEntity> p1 = playerDao.findById(game.getPlayer1());
+            Optional<PlayerEntity> p2 = playerDao.findById(game.getPlayer2());
+            if (p1.isPresent() && p2.isPresent()) {
+                Map<UUID, PlayerDto> players = new HashMap<>();
+                players.put(p1.get().getId(), p1.get().toDto());
+                players.put(p2.get().getId(), p2.get().toDto());
+                return players;
+            }
+        } catch (Exception e) {}
+        return Collections.emptyMap();
     }
 
     private Optional<GameDto> getGameDto(GameEntity game) {
         if(game == null) return Optional.empty();
-        final PlayerDto player1 = playerDao.findById(game.getPlayer1()).orElseThrow().toDto();
-        final PlayerDto player2 = playerDao.findById(game.getPlayer2()).orElseThrow().toDto();
-        return Optional.of(game.toDto(Map.of(player1.uuid(), player1, player2.uuid(), player2)));
+        try {
+            Map<UUID, PlayerDto> players = playersMap(game);
+            if (players.size() < 2) return Optional.empty();
+            return Optional.of(game.toDto(players));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 }
