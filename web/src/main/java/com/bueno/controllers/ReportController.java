@@ -57,20 +57,4 @@ public class ReportController {
                     .build();
         }
     }
-
-    @GetMapping(path = "/winrate")
-    private ResponseEntity<?> winrate() {
-        try {
-            var response = reportWinrateUseCase.createWinrateList();
-            return new ResponseBuilder(HttpStatus.OK)
-                    .addEntry(new ResponseEntry("players_winrate", response))
-                    .addTimestamp()
-                    .build();
-        } catch (Exception e) {
-            return new ResponseBuilder(HttpStatus.NOT_FOUND)
-                    .addEntry(new ResponseEntry("error", "the server couldn't found the winrate"))
-                    .addTimestamp()
-                    .build();
-        }
-    }
 }
