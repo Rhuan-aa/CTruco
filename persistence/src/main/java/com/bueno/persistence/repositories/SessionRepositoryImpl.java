@@ -135,7 +135,7 @@ public class SessionRepositoryImpl implements SessionRepository {
                     .add(new SessionDto(
                             (UUID) rs.getObject("uuid"),
                             (UUID) rs.getObject("player_uuid"),
-                            Instant.parse(rs.getTimestamp("expires_At").toString()))
+                            rs.getTimestamp("expires_at").toInstant())
                     );
         }
 
