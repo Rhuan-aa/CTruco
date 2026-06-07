@@ -55,7 +55,7 @@ public class UserController {
         this.encoder = encoder;
     }
 
-    @PostMapping(path = "/register")
+    @PostMapping(path = "/api/v1/register")
     public ResponseEntity<RegisterUserResponseDto> create(@RequestBody RegisterUserRequestDto request) {
         final String encodedPassword = encoder.encode(request.password());
         final RegisterUserRequestDto encodedPasswordRequest = new RegisterUserRequestDto(
