@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/api/v2/invites/")
+@RequestMapping(path = "/api/v1/invites/")
 public class InviteController {
 
     final FindSessionUseCase findSessionUseCase;

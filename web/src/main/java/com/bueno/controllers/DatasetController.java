@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/api/v2/datasets")
+@RequestMapping(path = "/api/v1/datasets")
 public class DatasetController {
 
     private final ExportDatasetUseCase exportDatasetUsecase;

@@ -46,7 +46,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/refresh-token")
+@RequestMapping(path = "/api/v1/refresh-token")
 public class RefreshTokenController {
 
     private final ApplicationUserService applicationUserService;
