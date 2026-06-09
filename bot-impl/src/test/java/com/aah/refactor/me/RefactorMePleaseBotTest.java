@@ -3,6 +3,7 @@ package com.aah.refactor.me;
 import com.bueno.spi.model.CardRank;
 import com.bueno.spi.model.GameIntel;
 import com.bueno.spi.model.TrucoCard;
+import com.local.aah.refactor.me.RefactorMePleaseBot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
