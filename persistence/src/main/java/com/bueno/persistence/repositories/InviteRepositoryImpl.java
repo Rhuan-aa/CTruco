@@ -28,7 +28,6 @@ public class InviteRepositoryImpl implements InviteRepository {
         }
     }
 
-    @Override
     public void deleteByPlayerUuid(UUID playerUuid) {
         String sql = "DELETE FROM invite WHERE host_player_uuid = ? OR invited_player_uuid = ?;";
         try (PreparedStatement preparedStatement = ConnectionFactory.createPreparedStatement(sql)) {

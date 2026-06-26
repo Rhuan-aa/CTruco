@@ -114,7 +114,6 @@ public class SessionRepositoryImpl implements SessionRepository {
         }
     }
 
-    @Override
     public Collection<SessionDto> findAllSessions() {
         String sql = "SELECT * FROM session";
         try (PreparedStatement preparedStatement = ConnectionFactory.createPreparedStatement(sql)) {
