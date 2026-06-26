@@ -108,7 +108,7 @@ public class JwtTokenHelper {
     }
 
     public boolean hasInvalidAuthorization(String authorizationHeader) {
-        return Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ");
+        return Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtProperties.getTokenPrefix());
     }
 
     public Claims extractClaims(String token) {

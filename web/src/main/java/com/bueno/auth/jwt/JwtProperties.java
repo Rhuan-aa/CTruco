@@ -46,7 +46,10 @@ public class JwtProperties {
     }
 
     public String getTokenPrefix() {
-        return tokenPrefix;
+        if (tokenPrefix == null) return null;
+        // Garante exatamente um espaco no final: arquivos .properties e env vars
+        // removem espacos a direita, mas o header HTTP exige "Bearer <token>".
+        return tokenPrefix.trim() + " ";
     }
 
     public void setTokenPrefix(String tokenPrefix) {
