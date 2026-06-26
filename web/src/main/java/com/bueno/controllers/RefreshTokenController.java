@@ -25,8 +25,11 @@ import com.bueno.auth.jwt.JwtProperties;
 import com.bueno.auth.jwt.JwtTokenHelper;
 import com.bueno.auth.security.ApplicationUser;
 import com.bueno.auth.security.ApplicationUserService;
+import com.bueno.domain.usecases.session.usecase.CreateSessionUseCase;
 import com.bueno.domain.usecases.session.usecase.DeleteSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.FindSessionUseCase;
 import com.bueno.domain.usecases.session.usecase.RefreshSessionUseCase;
+import com.bueno.domain.usecases.utils.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
@@ -52,14 +55,20 @@ public class RefreshTokenController {
     private final ApplicationUserService applicationUserService;
     private final JwtProperties jwtProperties;
     private final JwtTokenHelper jwtTokenHelper;
+    private final CreateSessionUseCase createSessionUseCase;
+    private final FindSessionUseCase findSessionUseCase;
     private final RefreshSessionUseCase refreshSessionUseCase;
     private final DeleteSessionUseCase deleteSessionUseCase;
 
     public RefreshTokenController(ApplicationUserService applicationUserService, JwtProperties jwtProperties,
-                                  JwtTokenHelper jwtTokenHelper, RefreshSessionUseCase refreshSessionUseCase, DeleteSessionUseCase deleteSessionUseCase) {
+                                  JwtTokenHelper jwtTokenHelper, CreateSessionUseCase createSessionUseCase,
+                                  FindSessionUseCase findSessionUseCase, RefreshSessionUseCase refreshSessionUseCase,
+                                  DeleteSessionUseCase deleteSessionUseCase) {
         this.applicationUserService = applicationUserService;
         this.jwtProperties = jwtProperties;
         this.jwtTokenHelper = jwtTokenHelper;
+        this.createSessionUseCase = createSessionUseCase;
+        this.findSessionUseCase = findSessionUseCase;
         this.refreshSessionUseCase = refreshSessionUseCase;
         this.deleteSessionUseCase = deleteSessionUseCase;
     }
@@ -89,7 +98,11 @@ public class RefreshTokenController {
 
             response.addHeader(jwtProperties.getAuthorizationHeader(), jwtProperties.getTokenPrefix() + token);
 
-            refreshSessionUseCase.refreshSession(userId);
+            try {
+                refreshSessionUseCase.refreshSession(userId);
+            } catch (EntityNotFoundException e) {
+                createSessionUseCase.createSessionForUser(userId);
+            }
             log.info("Refreshed session for: {}", userId);
 
             final Map<String, String> body = new HashMap<>();
