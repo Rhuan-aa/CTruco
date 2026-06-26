@@ -20,7 +20,6 @@
 
 package com.bueno.controllers;
 
-import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.game.usecase.ReportTopWinnersUseCase;
 import com.bueno.domain.usecases.game.usecase.ReportWinrateUseCase;
 import com.bueno.domain.usecases.game.usecase.UserRecordUseCase;
@@ -37,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -47,12 +47,14 @@ public class UserController {
     private final FindUserUseCase findUserUseCase;
     private final UserRecordUseCase userRecordUseCase;
     private final PasswordEncoder encoder;
+    private final ReportWinrateUseCase reportWinrateUseCase;
 
-    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder) {
+    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder, ReportWinrateUseCase reportWinrateUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.findUserUseCase = findUserUseCase;
         this.userRecordUseCase = userRecordUseCase;
         this.encoder = encoder;
+        this.reportWinrateUseCase = reportWinrateUseCase;
     }
 
     @PostMapping(path = "/api/v1/register")
@@ -82,5 +84,18 @@ public class UserController {
     @GetMapping(path = "/api/v1/users/{uuid}/matches")
     public UserRecordDto removeGame(@PathVariable UUID uuid) {
         return userRecordUseCase.listByUuid(uuid);
+    }
+
+    @GetMapping(path = "/api/v1/users/top-winners")
+    private ResponseEntity<?> topWinners() {
+        try {
+            ReportTopWinnersUseCase useCase = new ReportTopWinnersUseCase(reportWinrateUseCase);
+            var response = useCase.create(5);
+            return new ResponseBuilder(HttpStatus.OK)
+                    .addEntry(new ResponseEntry("topWinners", response))
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
