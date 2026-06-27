@@ -27,6 +27,7 @@ import com.bueno.auth.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import com.bueno.domain.usecases.session.usecase.CreateSessionUseCase;
 import com.bueno.domain.usecases.session.usecase.FindSessionUseCase;
 import com.bueno.domain.usecases.session.usecase.RefreshSessionUseCase;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -59,6 +60,9 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CreateSessionUseCase createSessionUseCase;
     private final FindSessionUseCase findSessionUseCase;
     private final RefreshSessionUseCase refreshSessionUseCase;
+
+    @Value("${cors.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
 
     public ApplicationSecurityConfig(PasswordEncoder encoder,
                                      ApplicationUserService applicationUserService,
@@ -108,10 +112,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "https://ctruco-front.onrender.com"
-        ));
+        configuration.setAllowedOrigins(List.of(frontendUrl));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

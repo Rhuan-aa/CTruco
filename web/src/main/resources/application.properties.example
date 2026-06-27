@@ -26,3 +26,9 @@ application.jwt.secretKey=${APPLICATION_JWT_SECRETKEY:CHANGE_ME_USE_A_LONG_RANDO
 application.jwt.tokenPrefix=Bearer
 application.jwt.tokenExpirationAfterMinutes=3
 application.jwt.refreshTokenExpirationAfterDays=14
+
+# --- CORS ---
+# URL do frontend autorizado a chamar a API (origem permitida no CORS).
+# Se nao definida, assume http://localhost:3000 (dev local).
+# Em producao, defina a env var CORS_FRONTEND_URL com a URL do front no Render.
+cors.frontend-url=${CORS_FRONTEND_URL:http://localhost:3000}

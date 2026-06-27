@@ -21,6 +21,7 @@
 package com.bueno.auth.security;
 
 import com.bueno.auth.jwt.JwtProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -30,6 +31,9 @@ public class WebMvcCorsConfiguration implements WebMvcConfigurer {
 
     private final JwtProperties jwtProperties;
 
+    @Value("${cors.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
+
     public WebMvcCorsConfiguration(JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
     }
@@ -38,10 +42,7 @@ public class WebMvcCorsConfiguration implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                .allowedOrigins(
-                        "http://localhost:3000",
-                        "https://ctruco-front.onrender.com"
-                )
+                .allowedOrigins(frontendUrl)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Authorization", "Content-Type")
                 .allowCredentials(true)
