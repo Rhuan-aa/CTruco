@@ -28,7 +28,6 @@ import com.bueno.domain.usecases.game.dtos.*;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.game.usecase.CreateGameUseCase;
 import com.bueno.domain.usecases.game.usecase.PlayWithBotsUseCase;
-import com.bueno.domain.usecases.game.usecase.RemoveGameUseCase;
 import com.bueno.domain.usecases.game.converter.GameConverter;
 import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.intel.dtos.IntelDto;
@@ -47,7 +46,6 @@ import java.util.stream.Collectors;
 public class GameController {
 
     private final CreateGameUseCase createGameUseCase;
-    private final RemoveGameUseCase removeGameUseCase;
     private final GameRepository gameRepository;
     private final RemoteBotRepository remoteBotRepository;
     private final RemoteBotApi remoteBotApi;
@@ -56,10 +54,12 @@ public class GameController {
 
 
     public GameController(CreateGameUseCase createGameUseCase,
-                          RemoveGameUseCase removeGameUseCase,
-                          GameRepository gameRepository, RemoteBotRepository remoteBotRepository, RemoteBotApi remoteBotApi, BotManagerService botManagerService, GameResultRepository gameResultRepository) {
+                          GameRepository gameRepository,
+                          RemoteBotRepository remoteBotRepository,
+                          RemoteBotApi remoteBotApi,
+                          BotManagerService botManagerService,
+                          GameResultRepository gameResultRepository) {
         this.createGameUseCase = createGameUseCase;
-        this.removeGameUseCase = removeGameUseCase;
         this.gameRepository = gameRepository;
         this.remoteBotRepository = remoteBotRepository;
         this.remoteBotApi = remoteBotApi;
@@ -93,10 +93,6 @@ public class GameController {
     }
 
     private static PlayWithBotsResponseDto getPlayWithBotsResponseDto(PlayWithBotsResultsDto results, SimulationRequestDto request) {
-
-        /* nessa stream é introduzido um List<PlayWithBotsDto> com os nomes de quem ganhou cada partida e é mapeado para um Map<String,Long>
-         em que a String é o nome do bot e o Long é a quantidade de vezes que ele ganhou.
-         TODO Tente achar um jeito melhor de fazer isso*/
         final Map<String, Long> filteredResults = results.info().stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
@@ -144,12 +140,5 @@ public class GameController {
                 .addEntry(new ResponseEntry("games", results))
                 .addTimestamp()
                 .build();
-    }
-
-    @DeleteMapping(path = "/players/{uuid}")
-    public ResponseEntity<IntelDto> removeGame(@PathVariable UUID uuid) {
-        final boolean isFromInactivity = false;
-        removeGameUseCase.byUserUuid(uuid,false);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

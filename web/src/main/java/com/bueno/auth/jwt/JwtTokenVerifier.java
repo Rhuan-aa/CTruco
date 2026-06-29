@@ -75,8 +75,10 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
     }
 
     private boolean isFromPermittedPath(HttpServletRequest request) {
-        return request.getServletPath().equals("/register")
-                || request.getServletPath().equals("/login")
-                || request.getServletPath().equals("/refresh-token");
+        final String path = request.getServletPath();
+        return path.equals("/api/v1/register")
+                || path.equals("/login")
+                || path.equals("/api/v1/refresh-token")
+                || path.startsWith("/ws-handshake");
     }
 }

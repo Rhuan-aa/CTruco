@@ -43,6 +43,65 @@ CTruco is composed of the following modules:
 - `web:`provides Spring Boot backend for a web version of the truco game for users to play against bots;
 
 
+## Configuring the Web Backend (`application.properties`)
+
+The `web` module (Spring Boot backend) reads its configuration from
+`web/src/main/resources/application.properties`. This file is **not** versioned
+(it is listed in `.gitignore` and should be treated like a `.env`), so you need
+to create it before running the backend. A template is provided at
+`web/src/main/resources/application.properties.example`.
+
+### Step by step
+
+1. **Copy the template** into the real file:
+
+   ```bash
+   cp web/src/main/resources/application.properties.example web/src/main/resources/application.properties
+   ```
+
+2. **Fill in the values.** Each entry uses the format
+   `property=${ENV_VAR:default}`: Spring will use the environment variable
+   `ENV_VAR` when it is defined, otherwise it falls back to the value after the
+   colon. For local development the defaults already work if you run the
+   databases locally; you only need to replace the placeholders marked
+   `CHANGE_ME`.
+
+   | Property | Environment variable | Description | Local default |
+   |----------|----------------------|-------------|---------------|
+   | `spring.datasource.url` | `SPRING_DATASOURCE_URL` | PostgreSQL JDBC URL | `jdbc:postgresql://localhost:5432/ctruco` |
+   | `spring.datasource.username` | `SPRING_DATASOURCE_USERNAME` | PostgreSQL user | `postgres` |
+   | `spring.datasource.password` | `SPRING_DATASOURCE_PASSWORD` | PostgreSQL password | *(set your own)* |
+   | `spring.data.mongodb.uri` | `SPRING_DATA_MONGODB_URI` | MongoDB connection URI | `mongodb://rootuser:rootpass@localhost:27017/ctruco?authSource=admin` |
+   | `application.jwt.secretKey` | `APPLICATION_JWT_SECRETKEY` | Long, random secret used to sign JWTs | *(set your own)* |
+   | `application.jwt.tokenExpirationAfterMinutes` | — | Access token lifetime (minutes) | `3` |
+   | `application.jwt.refreshTokenExpirationAfterDays` | — | Refresh token lifetime (days) | `14` |
+   | `cors.frontend-url` | `CORS_FRONTEND_URL` | URL of the frontend allowed by CORS | `http://localhost:3000` |
+
+3. **Generate a strong JWT secret** (do not reuse one that has ever been
+   committed/leaked). For example:
+
+   ```bash
+   openssl rand -base64 64
+   ```
+
+   Paste the result into `application.jwt.secretKey` (or export it as
+   `APPLICATION_JWT_SECRETKEY`).
+
+4. **Point CORS at your frontend.** During local development the default
+   `http://localhost:3000` is used automatically. In production (e.g. Render),
+   set the environment variable `CORS_FRONTEND_URL` to your deployed frontend
+   URL — for example `https://ctruco-front.onrender.com`. If the variable is not
+   set, the backend falls back to `http://localhost:3000`.
+
+5. **(Production) Prefer environment variables.** Instead of writing secrets
+   into `application.properties`, define the environment variables listed above
+   in your hosting panel (Render, etc.). The template already wires every
+   sensitive value to an environment variable, so no file changes are needed in
+   production.
+
+6. **Run the backend** with the `WebApp` class in the `web` module (it requires
+   the PostgreSQL and MongoDB databases to be reachable).
+
 ## Testing
 
 `Domain`, `bot-spi`, and `bot-impl` were developed using TDD and, therefore, are covered by several unit tests. In case of any change, 

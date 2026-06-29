@@ -20,8 +20,8 @@
 
 package com.bueno.controllers;
 
-import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.game.usecase.ReportTopWinnersUseCase;
+import com.bueno.domain.usecases.game.usecase.ReportWinrateUseCase;
 import com.bueno.domain.usecases.game.usecase.UserRecordUseCase;
 import com.bueno.domain.usecases.game.dtos.UserRecordDto;
 import com.bueno.domain.usecases.user.FindUserUseCase;
@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -46,17 +47,17 @@ public class UserController {
     private final FindUserUseCase findUserUseCase;
     private final UserRecordUseCase userRecordUseCase;
     private final PasswordEncoder encoder;
-    private final GameResultRepository gameResultRepository;
+    private final ReportWinrateUseCase reportWinrateUseCase;
 
-    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder, GameResultRepository gameResultRepository) {
+    public UserController(RegisterUserUseCase registerUserUseCase, FindUserUseCase findUserUseCase, UserRecordUseCase userRecordUseCase, PasswordEncoder encoder, ReportWinrateUseCase reportWinrateUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.findUserUseCase = findUserUseCase;
         this.userRecordUseCase = userRecordUseCase;
         this.encoder = encoder;
-        this.gameResultRepository = gameResultRepository;
+        this.reportWinrateUseCase = reportWinrateUseCase;
     }
 
-    @PostMapping(path = "/register")
+    @PostMapping(path = "/api/v1/register")
     public ResponseEntity<RegisterUserResponseDto> create(@RequestBody RegisterUserRequestDto request) {
         final String encodedPassword = encoder.encode(request.password());
         final RegisterUserRequestDto encodedPasswordRequest = new RegisterUserRequestDto(
@@ -66,23 +67,6 @@ public class UserController {
 
         final var response = registerUserUseCase.create(encodedPasswordRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    @GetMapping(path = "/api/v1/users/top-winners")
-    private ResponseEntity<?> topWinners() {
-        try {
-            ReportTopWinnersUseCase useCase = new ReportTopWinnersUseCase(gameResultRepository);
-            var response = useCase.create(5);
-            return new ResponseBuilder(HttpStatus.OK)
-                    .addEntry(new ResponseEntry("topWinners", response))
-                    .addTimestamp()
-                    .build();
-        } catch (Exception e) {
-            return new ResponseBuilder(HttpStatus.NOT_FOUND)
-                    .addEntry(new ResponseEntry("error", "the server couldn't found the top winners"))
-                    .addTimestamp()
-                    .build();
-        }
     }
 
     @GetMapping(path = "/api/v1/users/{uuid}")
@@ -100,5 +84,18 @@ public class UserController {
     @GetMapping(path = "/api/v1/users/{uuid}/matches")
     public UserRecordDto removeGame(@PathVariable UUID uuid) {
         return userRecordUseCase.listByUuid(uuid);
+    }
+
+    @GetMapping(path = "/api/v1/users/top-winners")
+    private ResponseEntity<?> topWinners() {
+        try {
+            ReportTopWinnersUseCase useCase = new ReportTopWinnersUseCase(reportWinrateUseCase);
+            var response = useCase.create(5);
+            return new ResponseBuilder(HttpStatus.OK)
+                    .addEntry(new ResponseEntry("topWinners", response))
+                    .build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

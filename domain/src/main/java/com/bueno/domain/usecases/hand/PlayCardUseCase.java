@@ -1,21 +1,21 @@
 /*
- *  Copyright (C) 2022 Lucas B. R. de Oliveira - IFSP/SCL
- *  Contact: lucas <dot> oliveira <at> ifsp <dot> edu <dot> br
+ * Copyright (C) 2022 Lucas B. R. de Oliveira - IFSP/SCL
+ * Contact: lucas <dot> oliveira <at> ifsp <dot> edu <dot> br
  *
- *  This file is part of CTruco (Truco game for didactic purpose).
+ * This file is part of CTruco (Truco game for didactic purpose).
  *
- *  CTruco is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * CTruco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  CTruco is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * CTruco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with CTruco.  If not, see <https://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License
+ * along with CTruco.  If not, see <https://www.gnu.org/licenses/>
  */
 
 package com.bueno.domain.usecases.hand;
@@ -33,6 +33,10 @@ import com.bueno.domain.usecases.game.converter.GameConverter;
 import com.bueno.domain.usecases.game.repos.GameRepository;
 import com.bueno.domain.usecases.game.repos.GameResultRepository;
 import com.bueno.domain.usecases.hand.dtos.PlayCardDto;
+import com.bueno.domain.usecases.hand.repos.HandResultRepository;
+import com.bueno.domain.usecases.hand.repos.IncreasedPointsRepository;
+import com.bueno.domain.usecases.hand.repos.MaoDeOnzeRepository;
+import com.bueno.domain.usecases.hand.repos.PlayedCardRepository;
 import com.bueno.domain.usecases.hand.validator.ActionValidator;
 import com.bueno.domain.usecases.intel.converters.CardConverter;
 import com.bueno.domain.usecases.intel.converters.IntelConverter;
@@ -44,33 +48,46 @@ import org.springframework.stereotype.Service;
 @Service
 public class PlayCardUseCase {
     private final GameRepository gameRepository;
-    private final GameResultRepository gameResultRepository;
     private final HandResultRepository handResultRepository;
+    private final MaoDeOnzeRepository maoDeOnzeRepository;
     private final BotUseCase botUseCase;
     private final RemoteBotRepository remoteBotRepository;
     private final RemoteBotApi remoteBotApi;
     private final BotManagerService botManagerService;
+    private final IncreasedPointsRepository increasePointsRepository;
+    private final PlayedCardRepository playedCardRepository;
 
     public PlayCardUseCase(GameRepository gameRepository,
                            RemoteBotRepository remoteBotRepository,
                            RemoteBotApi remoteBotApi, BotManagerService botManagerService) {
-        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, botManagerService);
-    }
+        this(gameRepository, remoteBotRepository, remoteBotApi, null, null, botManagerService, null, null, null);    }
 
     @Autowired
     public PlayCardUseCase(GameRepository gameRepository,
                            RemoteBotRepository remoteBotRepository,
                            RemoteBotApi remoteBotApi,
                            GameResultRepository gameResultRepository,
-                           HandResultRepository handResultRepository, BotManagerService botManagerService) {
+                           HandResultRepository handResultRepository, BotManagerService botManagerService, MaoDeOnzeRepository maoDeOnzeRepository, IncreasedPointsRepository increasePointsRepository, PlayedCardRepository playedCardRepository) {
 
         this.gameRepository = gameRepository;
-        this.gameResultRepository = gameResultRepository;
         this.handResultRepository = handResultRepository;
         this.remoteBotRepository = remoteBotRepository;
         this.remoteBotApi = remoteBotApi;
+        this.maoDeOnzeRepository = maoDeOnzeRepository;
         this.botManagerService = botManagerService;
-        this.botUseCase = new BotUseCase(gameRepository, remoteBotRepository, remoteBotApi, gameResultRepository, handResultRepository, botManagerService);
+        this.increasePointsRepository = increasePointsRepository;
+        this.playedCardRepository = playedCardRepository;
+        this.botUseCase = new BotUseCase(
+                gameRepository,
+                remoteBotRepository,
+                remoteBotApi,
+                gameResultRepository,
+                handResultRepository,
+                botManagerService,
+                maoDeOnzeRepository,
+                increasePointsRepository,
+                playedCardRepository
+        );
     }
 
     public IntelDto playCard(PlayCardDto request) {
@@ -96,7 +113,7 @@ public class PlayCardUseCase {
         if (hand.getCardToPlayAgainst().isEmpty()) hand.playFirstCard(player, playedCard);
         else hand.playSecondCard(player, playedCard);
 
-        final ResultHandler resultHandler = new ResultHandler(gameRepository, gameResultRepository, handResultRepository);
+        final ResultHandler resultHandler = new ResultHandler(handResultRepository, maoDeOnzeRepository, playedCardRepository);
         final IntelDto gameResult = resultHandler.handle(game);
 
         gameRepository.update(GameConverter.toDto(game));
@@ -105,8 +122,6 @@ public class PlayCardUseCase {
         botUseCase.playWhenNecessary(game, botManagerService);
 
         game = gameRepository.findByPlayerUuid(request.uuid()).map(GameConverter::fromDto).orElseThrow();
-        IntelDto intelResponse = IntelConverter.toDto(game.getIntel());
-//        if (game.isDone()) gameRepository.delete(game.getUuid());
-        return intelResponse;
+        return IntelConverter.toDto(game.getIntel());
     }
 }

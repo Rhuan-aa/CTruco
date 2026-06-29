@@ -29,5 +29,4 @@ import java.util.UUID;
     void create(Game game);
     void delete(UUID uuid);
     Optional<Game> findByUuid(UUID uuid);
-    Optional<Game> findByUserUuid(UUID uuid);
 }

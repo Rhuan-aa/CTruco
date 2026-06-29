@@ -24,6 +24,10 @@ import com.bueno.auth.jwt.JwtProperties;
 import com.bueno.auth.jwt.JwtTokenHelper;
 import com.bueno.auth.jwt.JwtTokenVerifier;
 import com.bueno.auth.jwt.JwtUsernameAndPasswordAuthenticationFilter;
+import com.bueno.domain.usecases.session.usecase.CreateSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.FindSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.RefreshSessionUseCase;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -35,8 +39,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.SecretKey;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Configuration
@@ -48,16 +57,25 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SecretKey secretKey;
     private final JwtProperties jwtProperties;
     private final JwtTokenHelper jwtTokenHelper;
+    private final CreateSessionUseCase createSessionUseCase;
+    private final FindSessionUseCase findSessionUseCase;
+    private final RefreshSessionUseCase refreshSessionUseCase;
+
+    @Value("${cors.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
 
     public ApplicationSecurityConfig(PasswordEncoder encoder,
                                      ApplicationUserService applicationUserService,
                                      SecretKey secretKey,
-                                     JwtProperties jwtProperties, JwtTokenHelper jwtTokenHelper) {
+                                     JwtProperties jwtProperties, JwtTokenHelper jwtTokenHelper, CreateSessionUseCase createSessionUseCase, FindSessionUseCase findSessionUseCase, RefreshSessionUseCase refreshSessionUseCase) {
         this.encoder = encoder;
         this.applicationUserService = applicationUserService;
         this.secretKey = secretKey;
         this.jwtProperties = jwtProperties;
         this.jwtTokenHelper = jwtTokenHelper;
+        this.createSessionUseCase = createSessionUseCase;
+        this.findSessionUseCase = findSessionUseCase;
+        this.refreshSessionUseCase = refreshSessionUseCase;
     }
 
     @Override
@@ -67,27 +85,42 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtProperties, jwtTokenHelper))
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtProperties, jwtTokenHelper, createSessionUseCase, findSessionUseCase, refreshSessionUseCase))
                 .addFilterAfter(new JwtTokenVerifier(jwtProperties, jwtTokenHelper), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers("/login").permitAll()
-                .antMatchers("/refresh-token").permitAll()
+                .antMatchers("/api/v1/refresh-token").permitAll()
+                .antMatchers("/api/v2/**").permitAll()
+                .antMatchers("/ws-handshake/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/register").permitAll()
+                .antMatchers("/api/v1/register").permitAll()
                 .antMatchers("/api/v1/**").authenticated()
                 .anyRequest()
                 .authenticated();
 
         http.exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-        // add this line to use H2 web console
         http.headers().frameOptions().disable();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth){
         auth.authenticationProvider(daoAuthenticationProvider());
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(frontendUrl));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of(jwtProperties.getAuthorizationHeader()));
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

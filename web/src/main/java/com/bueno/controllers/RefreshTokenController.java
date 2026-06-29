@@ -1,21 +1,21 @@
 /*
- *  Copyright (C) 2022 Lucas B. R. de Oliveira - IFSP/SCL
- *  Contact: lucas <dot> oliveira <at> ifsp <dot> edu <dot> br
+ * Copyright (C) 2022 Lucas B. R. de Oliveira - IFSP/SCL
+ * Contact: lucas <dot> oliveira <at> ifsp <dot> edu <dot> br
  *
- *  This file is part of CTruco (Truco game for didactic purpose).
+ * This file is part of CTruco (Truco game for didactic purpose).
  *
- *  CTruco is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * CTruco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  CTruco is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * CTruco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with CTruco.  If not, see <https://www.gnu.org/licenses/>
+ * You should have received a copy of the GNU General Public License
+ * along with CTruco.  If not, see <https://www.gnu.org/licenses/>
  */
 
 package com.bueno.controllers;
@@ -25,13 +25,19 @@ import com.bueno.auth.jwt.JwtProperties;
 import com.bueno.auth.jwt.JwtTokenHelper;
 import com.bueno.auth.security.ApplicationUser;
 import com.bueno.auth.security.ApplicationUserService;
+import com.bueno.domain.usecases.session.usecase.CreateSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.DeleteSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.FindSessionUseCase;
+import com.bueno.domain.usecases.session.usecase.RefreshSessionUseCase;
+import com.bueno.domain.usecases.utils.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -43,18 +49,28 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/refresh-token")
+@RequestMapping(path = "/api/v1/refresh-token")
 public class RefreshTokenController {
 
     private final ApplicationUserService applicationUserService;
     private final JwtProperties jwtProperties;
     private final JwtTokenHelper jwtTokenHelper;
+    private final CreateSessionUseCase createSessionUseCase;
+    private final FindSessionUseCase findSessionUseCase;
+    private final RefreshSessionUseCase refreshSessionUseCase;
+    private final DeleteSessionUseCase deleteSessionUseCase;
 
     public RefreshTokenController(ApplicationUserService applicationUserService, JwtProperties jwtProperties,
-                                  JwtTokenHelper jwtTokenHelper) {
+                                  JwtTokenHelper jwtTokenHelper, CreateSessionUseCase createSessionUseCase,
+                                  FindSessionUseCase findSessionUseCase, RefreshSessionUseCase refreshSessionUseCase,
+                                  DeleteSessionUseCase deleteSessionUseCase) {
         this.applicationUserService = applicationUserService;
         this.jwtProperties = jwtProperties;
         this.jwtTokenHelper = jwtTokenHelper;
+        this.createSessionUseCase = createSessionUseCase;
+        this.findSessionUseCase = findSessionUseCase;
+        this.refreshSessionUseCase = refreshSessionUseCase;
+        this.deleteSessionUseCase = deleteSessionUseCase;
     }
 
     @GetMapping
@@ -81,6 +97,13 @@ public class RefreshTokenController {
             final var token = jwtTokenHelper.createAccessToken(user, issuer);
 
             response.addHeader(jwtProperties.getAuthorizationHeader(), jwtProperties.getTokenPrefix() + token);
+
+            try {
+                refreshSessionUseCase.refreshSession(userId);
+            } catch (EntityNotFoundException e) {
+                createSessionUseCase.createSessionForUser(userId);
+            }
+            log.info("Refreshed session for: {}", userId);
 
             final Map<String, String> body = new HashMap<>();
             body.put("uuid", user.getUuid().toString());
@@ -112,13 +135,19 @@ public class RefreshTokenController {
             final var userId = UUID.fromString(principal);
             final var user = (ApplicationUser) applicationUserService.loadUserById(userId);
 
-            Cookie expiredToken = new Cookie(jwtProperties.getRefreshTokenProperty(), "");
-            expiredToken.setHttpOnly(true);
-            expiredToken.setMaxAge(0);
-            expiredToken.setPath("/");
+            ResponseCookie expiredToken = ResponseCookie.from(jwtProperties.getRefreshTokenProperty(), "")
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .sameSite("None")
+                    .maxAge(0)
+                    .build();
 
-            response.addCookie(expiredToken);
+            response.addHeader(HttpHeaders.SET_COOKIE, expiredToken.toString());
             response.setStatus(HttpStatus.NO_CONTENT.value());
+
+            deleteSessionUseCase.deleteByPlayerId(userId);
+            log.info("Deleted session for: {}", userId);
 
             log.info("User {} has been logged out.", user.getUsername());
         } catch (Exception e) {

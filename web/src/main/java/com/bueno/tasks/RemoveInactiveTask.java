@@ -21,29 +21,35 @@
 package com.bueno.tasks;
 
 import com.bueno.domain.usecases.game.usecase.RemoveGameUseCase;
+import com.bueno.domain.usecases.session.usecase.DeleteSessionUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
-//TODO - fazer um criar rank utilizando @Scheduled 5hrs
 @Component
 public class RemoveInactiveTask {
 
     private static final Logger log = LoggerFactory.getLogger(RemoveInactiveTask.class);
 
     private final RemoveGameUseCase removeGameUseCase;
+    private final DeleteSessionUseCase deleteSessionUseCase;
 
-    public RemoveInactiveTask(RemoveGameUseCase removeGameUseCase) {
+    public RemoveInactiveTask(RemoveGameUseCase removeGameUseCase, DeleteSessionUseCase deleteSessionUseCase) {
         this.removeGameUseCase = removeGameUseCase;
+        this.deleteSessionUseCase = deleteSessionUseCase;
     }
 
-    //@Scheduled(fixedRate = 30_000)
-    public void reportCurrentTime() {
+    @Scheduled(cron = "0 */5 * * * *")
+    @EventListener(ApplicationReadyEvent.class)
+    public void removeInactiveGames() {
         final List<UUID> removedGames = removeGameUseCase.byInactivityAfter(5);
         removedGames.forEach(gameUuid -> log.info("Removed game {} due to inactivity.", gameUuid));
+        deleteSessionUseCase.deleteAllExpired();
     }
 }
